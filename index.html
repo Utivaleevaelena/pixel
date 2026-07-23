@@ -1,0 +1,1835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pixel Experts Team</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jersey+25&family=Archivo:wght@300;400;500;600;700;900&family=DotGothic16&family=Fustat:wght@400;700&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js" crossorigin="anonymous"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body { background: #F3F3F2; color: #0C0C0B; -webkit-font-smoothing: antialiased; }
+    input, textarea, button { font-family: inherit; }
+    a { color: rgb(73,160,169); }
+    a:hover { color: rgb(229,158,55); }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0C0C0B; }
+    ::-webkit-scrollbar-thumb { background: #49A0A9; border-radius: 3px; }
+    .page-enter { animation: fadeIn 0.35s ease forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 0%,100% { opacity:.5; transform:scale(1); } 50% { opacity:1; transform:scale(1.05); } }
+    .reveal { opacity:0; transform:translateY(28px); transition:opacity .7s ease, transform .7s ease; }
+    .reveal.in { opacity:1; transform:translateY(0); }
+    @keyframes floatY { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-10px); } }
+    @keyframes glowPulse { 0%,100% { opacity:.5; } 50% { opacity:.85; } }
+  </style>
+</head>
+<body>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#0C0C0B"/><text x="50" y="62" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#E59E37" text-anchor="middle">PX</text></svg></template>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+/* ─── NAV ─── */
+function Nav({ activePage, setPage }) {
+  const links = [
+    { id: 'home', label: 'PiXEL' }, { id: 'work', label: 'Work' },
+    { id: 'branding', label: 'Branding' }, { id: 'about', label: 'About us' },
+    { id: 'contact', label: 'Contact' },
+  ];
+  return (
+    <nav style={{ position:'fixed', top:16, left:'50%', transform:'translateX(-50%)', zIndex:1000,
+      display:'flex', alignItems:'center', background:'rgba(255,255,255,0.84)',
+      backdropFilter:'blur(40px)', WebkitBackdropFilter:'blur(40px)', borderRadius:8,
+      padding:'0 6px', height:48, boxShadow:'0 2px 20px rgba(0,0,0,0.1)', userSelect:'none' }}>
+      {links.map(l => (
+        <button key={l.id} onClick={() => setPage(l.id)} style={{
+          background: activePage===l.id ? '#0C0C0B' : 'transparent', border:'none', borderRadius:6,
+          padding:'8px 16px', fontFamily:"'Jersey 25',sans-serif", fontSize:15,
+          color: activePage===l.id ? '#fff' : '#0C0C0B', cursor:'pointer', transition:'all .2s', whiteSpace:'nowrap',
+        }}
+        onMouseEnter={e=>{ if(activePage!==l.id) e.currentTarget.style.background='rgba(0,0,0,0.06)'; }}
+        onMouseLeave={e=>{ if(activePage!==l.id) e.currentTarget.style.background='transparent'; }}
+        >{l.label}</button>
+      ))}
+    </nav>
+  );
+}
+
+/* ─── FOOTER ─── */
+function Footer({ setPage }) {
+  const menu = [
+    ['PiXEL','home'],['Services and use cases','work'],['Branding','branding'],
+    ['Sites and App\u2019s','work'],['Workflow Optimization','work'],['AI Agents and chatbots','work'],
+    ['Check what you need','contact'],['Reviews','work'],['About us','about'],
+  ];
+  const bottom = { fontFamily:"'Archivo',sans-serif", fontSize:13, color:'#F3F3F2', cursor:'pointer', textTransform:'uppercase', letterSpacing:'.03em' };
+  return (
+    <footer style={{ background:'#0C0C0B', padding:'64px 80px 40px', color:'#F3F3F2', fontFamily:"'Archivo',sans-serif" }}>
+      <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:34, marginBottom:56 }}>
+        {menu.map(([label,to])=>(
+          <span key={label} onClick={()=>setPage(to)} style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:26, color:'#F3F3F2', textTransform:'uppercase', letterSpacing:'.04em', cursor:'pointer' }}
+            onMouseEnter={e=>e.currentTarget.style.color='rgb(229,158,55)'}
+            onMouseLeave={e=>e.currentTarget.style.color='#F3F3F2'}
+          >{label}</span>
+        ))}
+      </div>
+      <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between' }}>
+        <div style={{ display:'flex', gap:64 }}>
+          <span style={bottom} onClick={()=>setPage('contact')}>Contact</span>
+          <span style={bottom}>Legal</span>
+        </div>
+        <div style={{ display:'flex', gap:56 }}>
+          <span style={bottom} onClick={()=>window.open('#','_blank')}>LinkedIn</span>
+          <span style={bottom} onClick={()=>window.open('#','_blank')}>Instagram</span>
+          <span style={bottom} onClick={()=>window.open('#','_blank')}>YouTube</span>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+/* ─── HOME ─── */
+function Stage({ w, h, children }) {
+  const ref = useRef(null);
+  const [scale, setScale] = useState(typeof window!=='undefined' ? Math.min(1, window.innerWidth/w) : 1);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const upd = () => setScale(el.clientWidth / w);
+    upd();
+    const ro = new ResizeObserver(upd); ro.observe(el);
+    return () => ro.disconnect();
+  }, [w]);
+  return (
+    <div ref={ref} style={{ position:'relative', width:'100%', height:h*scale, overflow:'hidden' }}>
+      <div style={{ position:'absolute', top:0, left:0, width:w, height:h, transform:`scale(${scale})`, transformOrigin:'top left' }}>{children}</div>
+    </div>
+  );
+}
+
+/* Desktop app icon. `to` is where a click navigates — assign per icon. */
+function Ic({ x, y, size=96, src, label, to, setPage, dark, round=8, ext, face, flat, chat }) {
+  const [h, setH] = useState(false);
+  const onClick = () => { if (chat) window.dispatchEvent(new Event('open-pixelmate')); else if (ext) window.open(ext,'_blank'); else if (to) setPage(to); };
+  return (
+    <div onClick={onClick} onMouseEnter={()=>setH(true)} onMouseLeave={()=>setH(false)}
+      style={{ position:'absolute', left:x, top:y, width:size, display:'flex', flexDirection:'column', gap:10, alignItems:'center', cursor:'pointer', transition:'transform .18s ease', transform:h?'translateY(-4px) scale(1.04)':'none' }}>
+      {face ? (
+        <div style={{ width:size, height:size, borderRadius:round, overflow:'hidden', boxShadow:h?'0 16px 34px rgba(0,0,0,0.4)':'0 6px 18px rgba(0,0,0,0.28)', transition:'box-shadow .18s' }}>{face}</div>
+      ) : (
+        <img src={src} alt={label} style={{ width:size, height:size, borderRadius:round, objectFit:'cover', display:'block', boxShadow:flat?'none':(h?'0 16px 34px rgba(0,0,0,0.4)':'0 6px 18px rgba(0,0,0,0.28)'), transition:'box-shadow .18s' }} />
+      )}
+      <span style={{ width:size+16, marginLeft:-8, textAlign:'center', fontFamily:"'Archivo',sans-serif", fontSize:18, fontWeight:600, lineHeight:1.15, color:dark?'#F3F3F2':'#0C0C0B', textShadow:dark?'0 1px 6px rgba(0,0,0,0.5)':'none' }}>{label}</span>
+    </div>
+  );
+}
+
+function SocialFolder() {
+  const [open, setOpen] = useState(false);
+  const [hov, setHov] = useState(false);
+  const fx=1462, fy=343, size=96;
+  const lbl = { width:size+16, marginLeft:-8, textAlign:'center', fontFamily:"'Archivo',sans-serif", fontSize:18, fontWeight:600, lineHeight:1.15, color:'#0C0C0B' };
+  const socials = [
+    { src:'assets/home/ic-linkedin.png', label:'Linkedin', tx:1340, ty:176 },
+    { src:'assets/home/ic-whatsapp.png', label:'WhatsApp', tx:1462, ty:176 },
+    { src:'assets/home/ic-instagram.png', label:'Instagram', tx:1340, ty:343 },
+  ];
+  return (
+    <React.Fragment>
+      {socials.map((s)=>{
+        const f = open?1 : hov?0.28 : 0;
+        const x = fx + (s.tx-fx)*f, y = fy + (s.ty-fy)*f;
+        return (
+          <div key={s.label} onClick={(e)=>{ if(open){ e.stopPropagation(); window.open('#','_blank'); } }}
+            style={{ position:'absolute', left:x, top:y, width:size, display:'flex', flexDirection:'column', gap:10, alignItems:'center', opacity:open?1:hov?0.9:0, transform:`scale(${open?1:hov?0.9:0.5})`, transformOrigin:'center', transition:'all .3s cubic-bezier(.3,.85,.3,1)', pointerEvents:open?'auto':'none', zIndex:open?5:1, cursor:'pointer' }}>
+            <img src={s.src} alt={s.label} style={{ width:size, height:size, borderRadius:8, objectFit:'cover', display:'block', boxShadow:'0 8px 22px rgba(0,0,0,0.3)' }} />
+            <span style={lbl}>{s.label}</span>
+          </div>
+        );
+      })}
+      <div onClick={()=>setOpen(o=>!o)} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
+        style={{ position:'absolute', left:fx, top:fy, width:size, display:'flex', flexDirection:'column', gap:10, alignItems:'center', cursor:'pointer', zIndex:6, transition:'transform .18s', transform:(hov&&!open)?'translateY(-4px) scale(1.04)':'none' }}>
+        <img src="vector-mry3d7lh-bxzw.png" alt="Social media" style={{ width:size, height:size, borderRadius:8, objectFit:'cover', display:'block', boxShadow:'0 6px 18px rgba(0,0,0,0.28)' }} />
+        <span style={lbl}>Social media</span>
+      </div>
+    </React.Fragment>
+  );
+}
+
+function Home({ setPage }) {
+  const HERO=1240, ORANGE_H=1120, DARK_H=1120, W=1920;
+  const orangeTop=HERO, darkTop=HERO+ORANGE_H, H=HERO+ORANGE_H+DARK_H;
+  return (
+    <div style={{ fontFamily:"'Archivo',sans-serif", background:'#0C0C0B' }}>
+      <Stage w={W} h={H}>
+        {/* ── HERO BAND ── */}
+        <div style={{ position:'absolute', left:0, top:0, width:W, height:HERO, background:'url(assets/home/hero-bg.jpg) center top / cover no-repeat', backgroundColor:'#6f8f8c' }} />
+        {/* HERO BAND */}
+        {/* hero icons */}
+        <Ic setPage={setPage} x={362} y={176} src="assets/home/ic-ai-agents.png" label="AI Agents and chatbots" to="work" />
+        <Ic setPage={setPage} x={485} y={343} size={204} round={12} src="assets/home/ic-sites.png" label="SITES and APP’s" to="work" />
+        <Ic setPage={setPage} x={360} y={677} src="group-46011-mry3ji3z-2wzi.png" label="Branding" to="branding" />
+        <Ic setPage={setPage} x={607} y={677} src="mux-player-4-mry3jrnh-f93i.png" label="Business Automation" to="work" />
+        <Ic setPage={setPage} x={485} y={841} src="mux-player-5-mry3jyyx-c01r.png" label="Workflow Optimization" to="work" />
+        <Ic setPage={setPage} x={360} y={1090} src="vector-mry3d24q-j4ta.png" label="About us" to="about" />
+        <Ic setPage={setPage} x={1584} y={846} src="assets/home/icon-pixelmate.png" label="PixelMate" chat />
+        <SocialFolder />
+        {/* info pop-up */}
+        <div style={{ position:'absolute', left:729, top:866, width:462, borderRadius:8, background:'rgba(243,243,242,0.96)', backdropFilter:'blur(20px)', boxShadow:'0 30px 70px rgba(0,0,0,0.35)', padding:24, boxSizing:'border-box' }}>
+          <div style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:18, color:'#0C0C0B', marginBottom:12 }}>Your brand. Enhanced by AI.</div>
+          <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:8 }}>
+            <span style={{ fontSize:18 }}>⚠️</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:15, color:'#0C0C0B', letterSpacing:'.02em' }}>PRODUKT INFORMATION SHEET</span>
+          </div>
+          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:15, color:'rgba(12,12,11,0.65)', lineHeight:1.5, marginBottom:18 }}>We create brand experiences where intelligence and design work as one.</p>
+          <button onClick={()=>setPage('contact')} style={{ display:'block', width:'100%', background:'rgba(12,12,11,0.05)', color:'#0C0C0B', border:'none', borderRadius:8, padding:'16px', fontFamily:"'Archivo',sans-serif", fontSize:14, letterSpacing:'.1em', textTransform:'uppercase', cursor:'pointer', marginBottom:10 }}>START</button>
+          <button onClick={()=>setPage('contact')} style={{ display:'block', width:'100%', background:'#0C0C0B', color:'#F3F3F2', border:'none', borderRadius:8, padding:'16px', fontFamily:"'Archivo',sans-serif", fontSize:14, letterSpacing:'.1em', textTransform:'uppercase', cursor:'pointer' }}>Try $ 0 consultation</button>
+        </div>
+
+        {/* ── ORANGE BAND ── */}
+        <div style={{ position:'absolute', left:0, top:orangeTop, width:W, height:ORANGE_H, background:'rgb(229,158,55)' }} />
+        <Ic setPage={setPage} x={357} y={orangeTop+166} size={96} round={12} label="Janice website" to="moonlight-case"
+          face={<div style={{ width:'100%', height:'100%', background:'rgb(74,138,43)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:5 }}>
+            <div style={{ width:20, height:20, borderRadius:'50%', border:'1.5px solid rgb(214,178,94)', position:'relative' }}><span style={{ position:'absolute', top:-3, left:'50%', width:3, height:3, borderRadius:'50%', background:'rgb(214,178,94)', transform:'translateX(-50%)' }} /></div>
+            <span style={{ fontFamily:"'Marcellus SC','Marcellus',serif", fontSize:15, letterSpacing:'.04em', color:'rgb(232,226,214)' }}>MOONLIGHT</span>
+            <span style={{ fontFamily:"'Fustat',sans-serif", fontSize:7, letterSpacing:'.25em', color:'rgb(214,178,94)' }}>COMPASS</span>
+          </div>} />
+        <Ic setPage={setPage} x={1330} y={orangeTop+158} src="group-46011-2-mry3lx9q-hm54.png" label="Branding" to="branding" />
+        <Ic setPage={setPage} x={611} y={orangeTop+326} src="mux-player-7-mry3m4ep-0jwu.png" label="AI Personal Stylist App" to="uriel-case" />
+        <Ic setPage={setPage} x={900} y={orangeTop+166} src="assets/case-budrysowka-cover.jpg" label="Budrysówka website" to="budrysowka-case" />
+        <Ic setPage={setPage} x={1095} y={orangeTop+166} src="-copy-mry40rgx-xyyo.jpg" label="Herbaczar website" to="herbaczar-case" />
+        <Ic setPage={setPage} x={1300} y={orangeTop+340} src="assets/sacred-cover.jpg" label="Sacred Sound & Spirit website" to="sacred-case" />
+        {/* services heading */}
+        <div style={{ position:'absolute', left:703, top:orangeTop+490, width:514, display:'flex', flexDirection:'column', gap:16, alignItems:'center' }}>
+          <span style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:36, textTransform:'uppercase', color:'#F3F3F2', textAlign:'center' }}>Services and use cases</span>
+          <button onClick={()=>setPage('work')} style={{ width:462, background:'#0C0C0B', color:'#F3F3F2', border:'none', borderRadius:8, padding:'16px', fontFamily:"'Archivo',sans-serif", fontSize:12, letterSpacing:'.1em', textTransform:'uppercase', cursor:'pointer' }}>View all case studies</button>
+        </div>
+        <Ic setPage={setPage} x={48} y={orangeTop+713} size={292} round={0} flat src="vintage-pager-display-message-copy-1-mry3ni2x-fem8.png" label="Check what you need" to="contact" />
+        <Ic setPage={setPage} x={1095} y={orangeTop+671} size={204} round={12} src="assets/home/ic-sites.png" label="SITES and APP’s" to="work" />
+        <Ic setPage={setPage} x={1464} y={orangeTop+821} size={111} round={16} label="Place for you" to="contact"
+          face={<div style={{ width:'100%', height:'100%', background:'rgb(73,160,169)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <div style={{ background:'#0C0C0B', borderRadius:8, padding:'12px 14px', display:'flex', flexDirection:'column', alignItems:'center', lineHeight:1 }}>
+              <span style={{ fontFamily:"'DotGothic16',monospace", fontSize:20, color:'rgb(229,158,55)' }}>PLACE</span>
+              <span style={{ fontFamily:"'DotGothic16',monospace", fontSize:20, color:'rgb(73,160,169)' }}>FOR YOU</span>
+            </div>
+          </div>} />
+
+        {/* ── DARK BAND ── */}
+        <div style={{ position:'absolute', left:0, top:darkTop, width:W, height:DARK_H, background:'url(assets/home/dark-bg.jpg) center / cover no-repeat', backgroundColor:'#141a1a' }} />
+        {/* testimonial: Janice */}
+        <div style={{ position:'absolute', left:339, top:darkTop+150, width:372, borderRadius:8, background:'rgba(243,243,242,0.92)', backdropFilter:'blur(8px)', padding:'20px 22px', boxSizing:'border-box' }}>
+          <div style={{ display:'flex', gap:10, marginBottom:14 }}>
+            <span style={{ color:'rgba(12,12,11,0.4)', fontSize:14 }}>✕</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:14, color:'#0C0C0B', lineHeight:1.3 }}>Janice Grodsky, Founder &amp; CEO, Moonlight Company</span>
+          </div>
+          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:15, color:'rgba(12,12,11,0.75)', lineHeight:1.55 }}>My expectations have been exceeded. I never imagined the final outcome would be so precise, stylish, and full of life.<br /><br />What impressed me most was how the team asked the right questions and immersed themselves in my world — it felt like a true dialogue and deep understanding. I wholeheartedly recommend PIXEL to anyone who wants to build a brand identity that reflects their personality and values.<br /><br />And I want to extend a special thanks to the whole team — working with you has been an absolute pleasure.</p>
+        </div>
+        {/* testimonial: Uriel (sticky note) */}
+        <div style={{ position:'absolute', left:1160, top:darkTop+170, width:330, height:322, background:'url(assets/home/note-uriel.png) center / 100% 100% no-repeat', boxShadow:'0 20px 50px rgba(0,0,0,0.4)', padding:'26px 34px 34px', boxSizing:'border-box', overflow:'hidden', display:'flex', flexDirection:'column', justifyContent:'flex-end' }}>
+          <div style={{ display:'flex', gap:8, marginBottom:8 }}>
+            <span style={{ color:'rgba(12,12,11,0.5)', fontSize:12 }}>✕</span>
+            <span style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:12, color:'#0C0C0B', lineHeight:1.25 }}>Uriel Saenz, CEO, The US Lifestyle Group LLC</span>
+          </div>
+          <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:10, color:'rgba(12,12,11,0.82)', lineHeight:1.38, margin:0 }}>Working with PIXEL was a true example of transparent and creative partnership. The team adapted flexibly at every stage and did everything to deeply understand my brand. The result is a brand book where I can truly recognize myself and my company. It’s not just design — it’s the essence of The US Lifestyle Group. I recommend PIXEL to anyone looking for a team that not only creates visuals, but also builds a way of working tailored to you.</p>
+        </div>
+        <div style={{ position:'absolute', left:703, top:darkTop+540, width:514, textAlign:'center' }}>
+          <span style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:36, textTransform:'uppercase', color:'#F3F3F2' }}>Results come first</span>
+        </div>
+        <Ic setPage={setPage} x={360} y={darkTop+560} src="svg-mry3mg2d-zamd.png" label="About us" to="about" dark />
+        <Ic setPage={setPage} x={1240} y={darkTop+540} size={215} round={12} src="mux-player-4-mry3o6uu-r16d.png" label="Check what you need" to="contact" dark />
+      </Stage>
+    </div>
+  );
+}
+
+/* ─── WORK ─── */
+function Work({ setPage }) {
+  const [hov, setHov] = useState(null);
+  const cases = [
+    { id:'moonlight', title:'Moonlight Company', sub:'Website Strategy · Design · Development', tags:['Branding','Web'], color:'#49A0A9', quote:"It's not just a site, it's my story told right.", author:'Janice Grodsky, Founder & CEO', img:'assets/case-moonlight-cover.png' },
+    { id:'budrysowka', title:'Budrysówka', sub:'Rapid Launch · AI Photography · 2 Hours', tags:['Web','AI'], color:'#E59E37', quote:'Zero infrastructure costs, one link to share.', author:'Pixel Experts Team', img:'assets/case-budrysowka-cover.jpg' },
+    { id:'herbaczar', title:'Herbaczar', sub:'Brand Story · Web Design · Product Visuals', tags:['Branding','Web'], color:'#49A0A9', quote:'Elegant storytelling for a modern luxury tea brand.', author:'Pixel Experts Team', img:'assets/case-herbaczar-cover.jpg' },
+    { id:'sacred', title:'Sacred Sound & Spirit', sub:'Holistic Healing · Web Design · Forms', tags:['Web','Branding'], color:'#B28E56', quote:'A calming, conversion-focused website for a holistic healing practice rooted in prayer, sound, and energy work.', author:'Pixel Experts Team', img:'assets/sacred-cover.jpg' },
+    { id:'uriel', title:'Uriel Saenz', sub:'Brand Strategy · UX/UI · Mobile · AI', tags:['AI','Branding'], color:'#C6A15A', quote:'A complete digital product combining brand strategy, fashion expertise, and AI-powered personal styling.', author:'Pixel Experts Team', img:'assets/uriel-hero.jpg' },
+  ];
+  const tc = { AI:'#49A0A9', Branding:'#E59E37', Web:'#363838', Automation:'#363838' };
+  return (
+    <div style={{ fontFamily:"'Archivo',sans-serif", background:'#F3F3F2' }}>
+      {/* HERO */}
+      <section style={{ position:'relative', minHeight:'56vh', display:'flex', alignItems:'flex-end', overflow:'hidden', background:'#0C0C0B', padding:'0 80px 80px' }}>
+        <div style={{ position:'absolute', inset:0, backgroundImage:'url(assets/hero-bg.jpg)', backgroundSize:'cover', backgroundPosition:'center 20%', opacity:.45 }} />
+        <div style={{ position:'absolute', top:-200, right:-150, width:640, height:640, borderRadius:'50%', background:'rgb(73,160,169)', opacity:.22 }} />
+        <div style={{ position:'absolute', bottom:-100, left:-150, width:480, height:480, borderRadius:'50%', background:'rgba(73,160,169,0.18)' }} />
+        <div style={{ position:'relative', zIndex:2, maxWidth:1280, margin:'0 auto', width:'100%', paddingTop:140 }}>
+          <span style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:'rgb(73,160,169)', letterSpacing:'.15em', display:'block', marginBottom:16 }}>OUR WORK</span>
+          <h1 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(52px,8vw,100px)', color:'#F3F3F2', lineHeight:1 }}>Results come first</h1>
+          <p style={{ fontSize:17, color:'rgba(243,243,242,0.5)', maxWidth:480, marginTop:18, lineHeight:1.65 }}>We create brand experiences where intelligence and design work as one.</p>
+        </div>
+      </section>
+
+      {/* CASES */}
+      <section style={{ padding:'80px', background:'#F3F3F2' }}>
+        <div style={{ maxWidth:1280, margin:'0 auto', display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(540px,1fr))', gap:28 }}>
+          {cases.map(c=>(
+            <div key={c.id} onMouseEnter={()=>setHov(c.id)} onMouseLeave={()=>setHov(null)}
+              style={{ borderRadius:16, overflow:'hidden', background:'#fff', boxShadow:hov===c.id?'0 24px 56px rgba(0,0,0,0.11)':'0 4px 18px rgba(0,0,0,0.05)', transition:'all .35s', transform:hov===c.id?'translateY(-6px)':'none', cursor:'pointer', border:'1px solid rgba(0,0,0,0.05)' }}
+              onClick={()=>setPage(c.id==='moonlight'?'moonlight-case':c.id==='budrysowka'?'budrysowka-case':c.id==='herbaczar'?'herbaczar-case':c.id==='sacred'?'sacred-case':c.id==='uriel'?'uriel-case':'branding')}>
+              <div style={{ height:240, background:`url(${c.img}) center/cover no-repeat`, position:'relative' }}>
+                <div style={{ position:'absolute', inset:0, background:'linear-gradient(to bottom,transparent 40%,rgba(12,12,11,0.65) 100%)' }} />
+                <div style={{ position:'absolute', top:18, left:18, display:'flex', gap:8 }}>
+                  {c.tags.map(t=><span key={t} style={{ background:tc[t]||'#49A0A9', color:'#F3F3F2', fontFamily:"'Archivo',sans-serif", fontSize:10, fontWeight:700, padding:'3px 10px', borderRadius:4, letterSpacing:'.06em' }}>{t}</span>)}
+                </div>
+              </div>
+              <div style={{ padding:'24px 28px 28px' }}>
+                <h3 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:22, color:'#0C0C0B', margin:'0 0 4px' }}>{c.title}</h3>
+                <p style={{ fontSize:12, color:'rgba(12,12,11,0.45)', marginBottom:16 }}>{c.sub}</p>
+                <blockquote style={{ fontFamily:"'Fustat',sans-serif", fontSize:15, color:'#0C0C0B', lineHeight:1.55, borderLeft:`3px solid ${c.color}`, paddingLeft:14, margin:'0 0 12px' }}>"{c.quote}"</blockquote>
+                <span style={{ fontSize:11, color:'rgba(12,12,11,0.4)' }}>— {c.author}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{ textAlign:'center', marginTop:52 }}>
+          <button onClick={()=>setPage('contact')} style={{ background:'#0C0C0B', color:'#F3F3F2', border:'none', borderRadius:8, padding:'15px 44px', fontFamily:"'Archivo',sans-serif", fontSize:12, cursor:'pointer', letterSpacing:'.06em' }}>$ 0 consultation — ADD TO BAG</button>
+        </div>
+      </section>
+
+      {/* PIXEL vs TRADITIONAL */}
+      <section style={{ padding:'80px', background:'linear-gradient(160deg,rgb(73,160,169) 0%,rgb(229,158,55) 100%)' }}>
+        <div style={{ maxWidth:1280, margin:'0 auto' }}>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(36px,5vw,60px)', color:'#F3F3F2', textAlign:'center', marginBottom:52 }}>Pixel vs. Traditional</h2>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+            {[
+              { label:'Traditional Agency', items:['Fixed templates','Slow iterations','One-size-fits-all','AI as a gimmick','Handoff and forget'], dark:false },
+              { label:'Pixel Experts Team', items:['Bespoke systems','Continuous improvement','Built for your context','AI as core infrastructure','Long-term partnership'], dark:true },
+            ].map((col,i)=>(
+              <div key={i} style={{ background:col.dark?'rgba(12,12,11,0.92)':'rgba(255,255,255,0.12)', backdropFilter:'blur(20px)', borderRadius:12, padding:'32px', border:col.dark?'1px solid rgba(229,158,55,0.35)':'1px solid rgba(255,255,255,0.2)' }}>
+                <h3 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:19, color:col.dark?'rgb(229,158,55)':'rgba(243,243,242,0.65)', marginBottom:20 }}>{col.label}</h3>
+                {col.items.map((item,j)=>(
+                  <div key={j} style={{ display:'flex', alignItems:'center', gap:10, padding:'11px 0', borderBottom:j<col.items.length-1?'1px solid rgba(255,255,255,0.07)':'none' }}>
+                    <span style={{ color:col.dark?'rgb(73,142,33)':'rgba(243,243,242,0.3)', fontSize:15 }}>{col.dark?'✓':'×'}</span>
+                    <span style={{ fontSize:14, color:col.dark?'#F3F3F2':'rgba(243,243,242,0.5)' }}>{item}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* BIG QUOTE */}
+      <section style={{ padding:'100px 80px', background:'#0C0C0B', position:'relative', overflow:'hidden' }}>
+        <div style={{ position:'absolute', left:60, top:'50%', transform:'translateY(-50%)', opacity:.05, fontFamily:"'Jersey 25'", fontSize:400, color:'#fff', lineHeight:1, pointerEvents:'none', userSelect:'none' }}>"</div>
+        <div style={{ maxWidth:800, margin:'0 auto', textAlign:'center', position:'relative', zIndex:1 }}>
+          <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:'clamp(19px,2.5vw,28px)', color:'#F3F3F2', lineHeight:1.55, marginBottom:36 }}>
+            "PIXEL exceeded my expectations — the result is precise, stylish, and full of life. The team deeply understood my world and created a brand identity that truly reflects me."
+          </p>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:14 }}>
+            <div style={{ width:2, height:36, background:'rgb(229,158,55)' }} />
+            <div style={{ textAlign:'left' }}>
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:13, color:'#F3F3F2' }}>Uriel Saenz</div>
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:12, color:'rgba(243,243,242,0.45)' }}>CEO, The US Lifestyle Group LLC</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function BrandbookModal({ onClose }) {
+  const wrapRef = useRef(null);
+  const [status, setStatus] = useState('loading');
+  useEffect(() => {
+    const onKey = e => { if (e.key === 'Escape') onClose(); };
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKey);
+    let cancelled = false;
+    (async () => {
+      try {
+        if (!window.pdfjsLib) { setStatus('error'); return; }
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+        const pdf = await window.pdfjsLib.getDocument('assets/moonlight-brandbook.pdf').promise;
+        if (cancelled) return;
+        const wrap = wrapRef.current;
+        if (!wrap) return;
+        wrap.innerHTML = '';
+        for (let n = 1; n <= pdf.numPages; n++) {
+          const page = await pdf.getPage(n);
+          if (cancelled) return;
+          const viewport = page.getViewport({ scale: 2 });
+          const canvas = document.createElement('canvas');
+          canvas.width = viewport.width; canvas.height = viewport.height;
+          canvas.style.cssText = 'width:100%;height:auto;display:block;border-radius:8px;box-shadow:0 20px 50px rgba(0,0,0,0.4)';
+          wrap.appendChild(canvas);
+          await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+        }
+        if (!cancelled) setStatus('done');
+      } catch (e) { if (!cancelled) setStatus('error'); }
+    })();
+    return () => { cancelled = true; document.body.style.overflow = ''; window.removeEventListener('keydown', onKey); };
+  }, [onClose]);
+  return (
+    <div onClick={onClose} style={{ position:'fixed', inset:0, zIndex:2000, background:'rgba(12,12,11,0.9)', backdropFilter:'blur(6px)', display:'flex', flexDirection:'column', alignItems:'center', padding:'28px 24px' }}>
+      <div onClick={e=>e.stopPropagation()} style={{ width:'100%', maxWidth:820, display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16, flexShrink:0 }}>
+        <span style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:20, color:'#F3F3F2' }}>Moonlight Compass — Mini Brandbook</span>
+        <div style={{ display:'flex', gap:10 }}>
+          <a href="assets/moonlight-brandbook.pdf" download style={{ background:'rgba(243,243,242,0.12)', color:'#F3F3F2', border:'1px solid rgba(243,243,242,0.2)', borderRadius:8, padding:'9px 18px', fontFamily:"'Archivo',sans-serif", fontSize:13, fontWeight:700, textDecoration:'none' }}>Скачать PDF</a>
+          <button onClick={onClose} style={{ background:'rgb(229,158,55)', color:'#0C0C0B', border:'none', borderRadius:8, padding:'9px 18px', fontFamily:"'Archivo',sans-serif", fontSize:13, fontWeight:700, cursor:'pointer' }}>Закрыть ✕</button>
+        </div>
+      </div>
+      <div onClick={e=>e.stopPropagation()} style={{ width:'100%', maxWidth:820, flex:1, minHeight:0, overflowY:'auto', display:'flex', flexDirection:'column', gap:20, padding:'4px 4px 20px' }}>
+        {status==='loading' && <div style={{ color:'rgba(243,243,242,0.7)', textAlign:'center', padding:'60px 0', fontFamily:"'Fustat',sans-serif" }}>Загрузка брендбука…</div>}
+        {status==='error' && <div style={{ color:'rgba(243,243,242,0.7)', textAlign:'center', padding:'60px 0', fontFamily:"'Fustat',sans-serif" }}>Не удалось открыть файл. <a href="assets/moonlight-brandbook.pdf" download style={{ color:'rgb(229,158,55)' }}>Скачать PDF</a></div>}
+        <div ref={wrapRef} style={{ display:'flex', flexDirection:'column', gap:20 }} />
+      </div>
+    </div>
+  );
+}
+
+function BrandbookPreview() {
+  const canvasRef = useRef(null);
+  const download = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('assets/moonlight-brandbook.pdf');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'Moonlight Compass — Brandbook.pdf';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+    } catch (err) {
+      window.open('assets/moonlight-brandbook.pdf', '_blank');
+    }
+  };
+  useEffect(() => {
+    let cancelled = false;
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+      window.pdfjsLib.getDocument('assets/moonlight-brandbook.pdf').promise.then(pdf => pdf.getPage(1)).then(page => {
+        if (cancelled) return;
+        const scale = 2;
+        const viewport = page.getViewport({ scale });
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        canvas.width = viewport.width; canvas.height = viewport.height;
+        const ctx = canvas.getContext('2d');
+        page.render({ canvasContext: ctx, viewport });
+      }).catch(()=>{});
+    }
+    return () => { cancelled = true; };
+  }, []);
+  return (
+    <a href="assets/moonlight-brandbook.pdf" download onClick={download} style={{ display:'block', width:'100%', position:'relative', borderRadius:10, overflow:'hidden', border:'1px solid rgba(12,12,11,0.1)', cursor:'pointer', textDecoration:'none' }}>
+      <div style={{ width:'100%', height:320, position:'relative', background:'#0C0C0B' }}>
+        <canvas ref={canvasRef} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
+        <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg,rgba(12,12,11,0) 55%,rgba(12,12,11,0.85) 100%)' }} />
+        <div style={{ position:'absolute', bottom:16, left:0, right:0, textAlign:'center' }}>
+          <span style={{ background:'rgb(229,158,55)', color:'#0C0C0B', fontSize:12, fontWeight:700, padding:'10px 22px', borderRadius:20, letterSpacing:'.04em' }}>Download full brandbook ↓</span>
+        </div>
+      </div>
+    </a>
+  );
+}
+
+/* ─── MOONLIGHT CASE STUDY ─── */
+function MoonlightCase({ setPage }) {
+  const did = [
+    { icon:'⟡', title:'Brand Diagnostics', text:"We began with a deep-dive interview to uncover the essence of Moonlight Company and hear the brand's voice between the lines." },
+    { icon:'◈', title:'Visual & Narrative Strategy', text:'We curated moodboards and crafted a visual language, including a tailored color palette, font pairings, logo, and tone of voice.' },
+    { icon:'◻', title:'UX Audit', text:'We analyzed the existing website to identify friction points and usability gaps, turning insights into a clear and actionable redesign brief.' },
+    { icon:'⬡', title:'UX Interface Testing', text:"We ensured every interaction felt intuitive and aligned with the brand's calm, confident character." },
+    { icon:'☾', title:'Design & Development', text:'We created a Figma prototype and brought it to life — a website that speaks for Janice the way she would speak herself: quietly powerful, effortlessly elegant.' },
+  ];
+  const results = ['A cohesive and emotionally resonant brand identity','A user-friendly, mobile-optimized, intuitive website','A digital space that feels true to Janice','Elevated trust, clarity, and connection'];
+  return (
+    <div style={{ fontFamily:"'Archivo',sans-serif", background:'#F3F3F2' }}>
+      {/* HERO */}
+      <section style={{ position:'relative', minHeight:'62vh', display:'flex', alignItems:'flex-end', overflow:'hidden', background:'#0C0C0B', padding:'0 80px 72px' }}>
+        <div style={{ position:'absolute', inset:0, backgroundImage:'url(assets/case-moonlight-site.jpg)', backgroundSize:'cover', backgroundPosition:'center top', opacity:.28 }} />
+        <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg,rgba(12,12,11,0.55) 0%,rgba(12,12,11,0.92) 100%)' }} />
+        <div style={{ position:'absolute', top:-200, right:-150, width:640, height:640, borderRadius:'50%', background:'rgb(73,160,169)', opacity:.2 }} />
+        <div style={{ position:'relative', zIndex:2, maxWidth:1280, margin:'0 auto', width:'100%', paddingTop:150 }}>
+          <span onClick={()=>setPage('work')} style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:'rgb(73,160,169)', letterSpacing:'.15em', display:'block', marginBottom:16, cursor:'pointer' }}>← OUR WORK / CASE STUDY</span>
+          <h1 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(48px,7vw,88px)', color:'#F3F3F2', lineHeight:1, margin:'0 0 22px' }}>Moonlight Company</h1>
+          <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:17, color:'rgba(243,243,242,0.6)', maxWidth:560, lineHeight:1.65 }}>Website strategy, design & development for a soul-aligned somatic coach and spiritual strategist.</p>
+          <a href="https://moonlightcompass.com" target="_blank" rel="noopener" style={{ display:'inline-block', marginTop:28, background:'rgb(73,160,169)', color:'#0C0C0B', borderRadius:8, padding:'16px 36px', fontFamily:"'Archivo',sans-serif", fontSize:14, fontWeight:700, letterSpacing:'.05em', textDecoration:'none' }}>View Live Website ↗</a>
+        </div>
+      </section>
+
+      {/* META ROW */}
+      <section style={{ padding:'56px 80px', background:'#F3F3F2', borderBottom:'1px solid rgba(12,12,11,0.08)' }}>
+        <div style={{ maxWidth:1280, margin:'0 auto', display:'grid', gridTemplateColumns:'1.2fr 1fr 1.2fr', gap:48 }}>
+          <div style={{ display:'flex', gap:16, alignItems:'center' }}>
+            <img src="assets/case-moonlight-janice.png" alt="Janice Grodsky" style={{ width:64, height:64, borderRadius:'50%', objectFit:'cover', border:'2px solid rgba(73,160,169,0.4)' }} />
+            <div>
+              <span style={{ fontSize:11, color:'rgba(12,12,11,0.45)', display:'block', marginBottom:3, letterSpacing:'.04em' }}>CLIENT</span>
+              <div style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:19, color:'#0C0C0B' }}>Janice Grodsky</div>
+              <div style={{ fontSize:12, color:'rgba(12,12,11,0.5)' }}>Founder & CEO, Moonlight Company</div>
+            </div>
+          </div>
+          <div>
+            <span style={{ fontSize:11, color:'rgba(12,12,11,0.45)', display:'block', marginBottom:6, letterSpacing:'.04em' }}>SCOPE</span>
+            <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+              {['Full brand immersion','UX architecture','Visual identity','Design & development'].map(t=>(
+                <span key={t} style={{ background:'rgba(73,160,169,0.1)', color:'rgb(73,160,169)', fontSize:11, fontWeight:700, padding:'5px 11px', borderRadius:5, letterSpacing:'.03em' }}>{t}</span>
+              ))}
+            </div>
+          </div>
+          <div>
+            <span style={{ fontSize:11, color:'rgba(12,12,11,0.45)', display:'block', marginBottom:6, letterSpacing:'.04em' }}>OBJECTIVE</span>
+            <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:14, color:'rgba(12,12,11,0.7)', lineHeight:1.6 }}>To design a website that truly reflects Janice's personality and the philosophy behind her brand.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* WHERE IT STARTED */}
+      <section style={{ padding:'88px 80px', background:'#F3F3F2' }}>
+        <div style={{ maxWidth:820, margin:'0 auto' }}>
+          <span style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:'rgb(229,158,55)', letterSpacing:'.15em', display:'block', marginBottom:18 }}>WHERE IT STARTED</span>
+          <p style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(24px,3vw,34px)', color:'#0C0C0B', lineHeight:1.4 }}>When Janice came to us, she had already worked with other teams — but the results always felt... off. What was missing? Subtlety. Alignment. Soul. She didn't need "just a website." She needed a space that felt like her.</p>
+        </div>
+      </section>
+
+      {/* STEP 01 */}
+      <section style={{ padding:'0 80px 96px', background:'#F3F3F2' }}>
+        <div style={{ maxWidth:1280, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 1fr', gap:56, alignItems:'start' }}>
+          <div>
+            <span style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:'rgb(73,160,169)', letterSpacing:'.15em', display:'block', marginBottom:16 }}>STEP 01</span>
+            <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(28px,3.6vw,40px)', color:'#0C0C0B', marginBottom:20, lineHeight:1.1 }}>Business Audit & Brand Foundation</h2>
+            <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:15, color:'rgba(12,12,11,0.6)', lineHeight:1.75, marginBottom:16 }}>Every successful website starts long before the first design mockup.</p>
+            <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:15, color:'rgba(12,12,11,0.6)', lineHeight:1.75, marginBottom:16 }}>We analyzed the business, audience, existing website, and brand perception. The audit revealed that the biggest challenge wasn't the interface—it was the lack of a clear visual identity.</p>
+            <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:15, color:'rgba(12,12,11,0.6)', lineHeight:1.75 }}>Before designing the website, we developed a mini brandbook that defined the visual language of Moonlight Company: logo system, typography, color palette, moodboard, and design principles. It became the foundation for the entire digital experience.</p>
+          </div>
+          <div style={{ background:'#fff', borderRadius:14, border:'1px solid rgba(0,0,0,0.06)', boxShadow:'0 20px 56px rgba(0,0,0,0.08)', padding:36, display:'flex', flexDirection:'column', gap:18, alignItems:'flex-start' }}>
+            <span style={{ color:'rgb(229,158,55)', fontSize:26 }}>◈</span>
+            <h3 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:24, color:'#0C0C0B' }}>Mini Brandbook</h3>
+            <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:14, color:'rgba(12,12,11,0.55)', lineHeight:1.65 }}>Created after the business & website audit to ensure every design decision reflected the founder's personality and brand philosophy.</p>
+            <BrandbookPreview />
+          </div>
+        </div>
+      </section>
+
+      {/* WHAT WE DID */}
+      <section style={{ padding:'0 80px 96px', background:'#F3F3F2' }}>
+        <div style={{ maxWidth:1280, margin:'0 auto' }}>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(30px,4vw,44px)', color:'#0C0C0B', marginBottom:44 }}>What We Did</h2>
+          <div style={{ display:'flex', flexDirection:'column', gap:0 }}>
+            {did.map((d,i)=>(
+              <div key={i} style={{ display:'grid', gridTemplateColumns:'56px 1fr', gap:24, padding:'26px 0', borderBottom:i<did.length-1?'1px solid rgba(12,12,11,0.08)':'none' }}>
+                <span style={{ fontSize:26, color:'rgb(73,160,169)' }}>{d.icon}</span>
+                <div>
+                  <h3 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:19, color:'#0C0C0B', marginBottom:6 }}>{d.title}</h3>
+                  <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:14, color:'rgba(12,12,11,0.6)', lineHeight:1.65, maxWidth:640 }}>{d.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SEE THE PROJECT LIVE */}
+      <section style={{ padding:'0 80px 96px', background:'#F3F3F2' }}>
+        <div style={{ maxWidth:1280, margin:'0 auto', position:'relative', borderRadius:16, overflow:'hidden' }}>
+          <img src="assets/case-moonlight-laptop.jpg" alt="Moonlight Compass website on laptop" style={{ width:'100%', display:'block' }} />
+          <div style={{ position:'absolute', left:'6%', top:0, height:'100%', width:'34%', display:'flex', flexDirection:'column', justifyContent:'center' }}>
+            <span style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:'rgb(73,160,169)', letterSpacing:'.15em', display:'block', marginBottom:16 }}>SEE THE PROJECT LIVE</span>
+            <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:16, color:'rgba(243,243,242,0.75)', lineHeight:1.7, marginBottom:28 }}>Experience the website in your browser exactly as the client's audience does.</p>
+            <a href="https://moonlightcompass.com" target="_blank" rel="noopener" style={{ display:'inline-flex', alignItems:'center', gap:8, background:'#F3F3F2', color:'#0C0C0B', border:'none', borderRadius:8, padding:'14px 28px', fontFamily:"'Archivo',sans-serif", fontSize:13, fontWeight:700, letterSpacing:'.04em', textDecoration:'none', transition:'background .2s', width:'fit-content' }}
+              onMouseEnter={e=>e.currentTarget.style.background='rgb(229,158,55)'}
+              onMouseLeave={e=>e.currentTarget.style.background='#F3F3F2'}
+            >Explore Live Website ↗</a>
+            <div style={{ fontSize:12, color:'rgba(243,243,242,0.55)', marginTop:14 }}>moonlightcompass.com</div>
+          </div>
+        </div>
+      </section>
+
+      {/* RESULT */}
+      <section style={{ padding:'96px 80px', background:'linear-gradient(160deg,rgb(73,160,169) 0%,#0C0C0B 100%)' }}>
+        <div style={{ maxWidth:1280, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 1fr', gap:60, alignItems:'center' }}>
+          <div>
+            <span style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:'#F3F3F2', letterSpacing:'.15em', display:'block', marginBottom:16, opacity:.7 }}>THE RESULT</span>
+            <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(30px,4vw,44px)', color:'#F3F3F2', lineHeight:1.1 }}>What Moonlight Company gained</h2>
+          </div>
+          <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+            {results.map((r,i)=>(
+              <div key={i} style={{ background:'rgba(243,243,242,0.1)', backdropFilter:'blur(14px)', border:'1px solid rgba(243,243,242,0.16)', borderRadius:10, padding:'16px 20px', display:'flex', gap:12, alignItems:'center' }}>
+                <span style={{ color:'rgb(229,158,55)', fontSize:15 }}>✓</span>
+                <span style={{ fontSize:14, color:'#F3F3F2' }}>{r}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* QUOTE */}
+      <section style={{ padding:'100px 80px', background:'#0C0C0B', position:'relative', overflow:'hidden' }}>
+        <div style={{ position:'absolute', left:60, top:'50%', transform:'translateY(-50%)', opacity:.05, fontFamily:"'Jersey 25'", fontSize:400, color:'#fff', lineHeight:1, pointerEvents:'none', userSelect:'none' }}>"</div>
+        <div style={{ maxWidth:800, margin:'0 auto', textAlign:'center', position:'relative', zIndex:1 }}>
+          <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:'clamp(19px,2.5vw,28px)', color:'#F3F3F2', lineHeight:1.55, marginBottom:36 }}>
+            "My expectations were exceeded. I never imagined the final result would be this precise, stylish, and alive. What impressed me the most was how the team asked the right questions and truly immersed themselves in my world — it felt like a real dialogue and deep understanding."
+          </p>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:14 }}>
+            <img src="assets/case-moonlight-janice.png" alt="Janice Grodsky" style={{ width:44, height:44, borderRadius:'50%', objectFit:'cover' }} />
+            <div style={{ textAlign:'left' }}>
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:13, color:'#F3F3F2' }}>Janice Grodsky</div>
+              <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:12, color:'rgba(243,243,242,0.45)' }}>Founder & CEO, Moonlight Company</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* WHY IT WORKS */}
+      <section style={{ padding:'88px 80px', background:'#F3F3F2' }}>
+        <div style={{ maxWidth:820, margin:'0 auto', textAlign:'center' }}>
+          <span style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:'rgb(229,158,55)', letterSpacing:'.15em', display:'block', marginBottom:18 }}>WHY IT WORKS</span>
+          <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:18, color:'rgba(12,12,11,0.65)', lineHeight:1.75 }}>We don't just build websites — we craft digital spaces where founders feel seen. In Janice's case, that alignment was key. Her business is built on trust and personal connection — and now, her website reflects that.</p>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section style={{ padding:'96px 80px', background:'#0C0C0B', textAlign:'center' }}>
+        <div style={{ maxWidth:580, margin:'0 auto' }}>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(32px,5vw,48px)', color:'#F3F3F2', marginBottom:16 }}>Want a website where you feel like you?</h2>
+          <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:15, color:'rgba(243,243,242,0.55)', marginBottom:32 }}>Reach out — we'd love to hear your story.</p>
+          <div style={{ display:'flex', gap:12, justifyContent:'center' }}>
+            <button onClick={()=>setPage('contact')} style={{ background:'#F3F3F2', color:'#0C0C0B', border:'none', borderRadius:8, padding:'15px 36px', fontFamily:"'Archivo',sans-serif", fontSize:13, fontWeight:700, cursor:'pointer', letterSpacing:'.05em' }}>Get in touch</button>
+            <button onClick={()=>setPage('work')} style={{ background:'transparent', color:'#F3F3F2', border:'1px solid rgba(243,243,242,0.3)', borderRadius:8, padding:'15px 28px', fontFamily:"'Archivo',sans-serif", fontSize:13, cursor:'pointer' }}>More work →</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* ─── SHARED: SCROLL REVEAL ─── */
+function Reveal({ children, delay=0, style }) {
+  const ref = useRef(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setInView(true); obs.disconnect(); } }, { threshold:0.15 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return <div ref={ref} className={`reveal${inView?' in':''}`} style={{ transitionDelay:`${delay}ms`, ...style }}>{children}</div>;
+}
+
+/* ─── SHARED: BEFORE/AFTER SLIDER ─── */
+function BeforeAfterSlider({ before, after }) {
+  const [pos, setPos] = useState(50);
+  return (
+    <div style={{ position:'relative', width:'100%', aspectRatio:'16/10', borderRadius:16, overflow:'hidden', userSelect:'none', boxShadow:'0 24px 64px rgba(0,0,0,0.16)' }}>
+      <img src={after} alt="After" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />
+      <div style={{ position:'absolute', inset:0, width:`${pos}%`, overflow:'hidden' }}>
+        <img src={before} alt="Before" style={{ width:`${100/(pos/100)}%`, height:'100%', objectFit:'cover', maxWidth:'none' }} />
+      </div>
+      <div style={{ position:'absolute', top:16, left:16, background:'rgba(12,12,11,0.7)', color:'#F3F3F2', fontSize:11, fontWeight:700, padding:'5px 12px', borderRadius:5, letterSpacing:'.05em' }}>BEFORE</div>
+      <div style={{ position:'absolute', top:16, right:16, background:'rgba(229,158,55,0.92)', color:'#0C0C0B', fontSize:11, fontWeight:700, padding:'5px 12px', borderRadius:5, letterSpacing:'.05em' }}>AFTER</div>
+      <div style={{ position:'absolute', top:0, bottom:0, left:`${pos}%`, width:2, background:'#F3F3F2', transform:'translateX(-1px)' }} />
+      <div style={{ position:'absolute', top:'50%', left:`${pos}%`, transform:'translate(-50%,-50%)', width:38, height:38, borderRadius:'50%', background:'#F3F3F2', display:'flex', alignItems:'center', justifyContent:'center', fontSize:13, color:'#0C0C0B', boxShadow:'0 4px 14px rgba(0,0,0,0.3)', pointerEvents:'none' }}>↔</div>
+      <input type="range" min="0" max="100" value={pos} onChange={e=>setPos(Number(e.target.value))} style={{ position:'absolute', inset:0, width:'100%', height:'100%', opacity:0, cursor:'ew-resize', margin:0 }} />
+    </div>
+  );
+}
+
+/* ─── STAY CALCULATOR ─── */
+function StayCalculator() {
+  const [nights, setNights] = React.useState(2);
+  const [guests, setGuests] = React.useState(2);
+  const [pet, setPet] = React.useState(false);
+  const PER_NIGHT = 1000, PET_FEE = 100;
+  const base = nights * PER_NIGHT;
+  const total = base + (pet ? PET_FEE : 0);
+  const green = 'rgb(77,100,64)';
+  const Stepper = ({ value, set, min, max }) => {
+    const btn = { width:52, height:52, borderRadius:'50%', border:'1px solid rgba(12,12,11,0.18)', background:'#fff', color:'#0C0C0B', fontSize:22, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', lineHeight:1, transition:'all .15s' };
+    return (
+      <div style={{ display:'flex', alignItems:'center', gap:22 }}>
+        <button onClick={()=>set(Math.max(min, value-1))} style={btn}
+          onMouseEnter={e=>e.currentTarget.style.background='rgba(12,12,11,0.04)'}
+          onMouseLeave={e=>e.currentTarget.style.background='#fff'}>−</button>
+        <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:24, fontWeight:700, color:'#0C0C0B', minWidth:22, textAlign:'center' }}>{value}</span>
+        <button onClick={()=>set(Math.min(max, value+1))} style={btn}
+          onMouseEnter={e=>e.currentTarget.style.background='rgba(12,12,11,0.04)'}
+          onMouseLeave={e=>e.currentTarget.style.background='#fff'}>+</button>
+      </div>
+    );
+  };
+  const row = { display:'flex', alignItems:'center', justifyContent:'space-between', padding:'26px 0' };
+  const rule = { height:1, background:'rgba(12,12,11,0.08)' };
+  const label = { fontFamily:"'Archivo',sans-serif", fontSize:22, fontWeight:700, color:'#0C0C0B' };
+  const sub = { fontFamily:"'Fustat',sans-serif", fontSize:15, color:'rgba(12,12,11,0.5)', marginTop:4 };
+  return (
+    <div style={{ background:'#FBFBFA', borderRadius:24, padding:'8px 40px 40px', border:'1px solid rgba(12,12,11,0.06)', boxShadow:'0 30px 70px rgba(0,0,0,0.08)' }}>
+      <div style={row}>
+        <div><div style={label}>Nights</div><div style={sub}>{nights} {nights===1?'night':'nights'}</div></div>
+        <Stepper value={nights} set={setNights} min={1} max={30} />
+      </div>
+      <div style={rule} />
+      <div style={row}>
+        <div><div style={label}>Guests</div><div style={sub}>Up to 4 guests included</div></div>
+        <Stepper value={guests} set={setGuests} min={1} max={4} />
+      </div>
+      <div style={rule} />
+      <div style={row}>
+        <div><div style={label}>Yes, I am bringing a pet</div><div style={sub}>One-time fee of 100 zł</div></div>
+        <button onClick={()=>setPet(!pet)} aria-pressed={pet} style={{ width:40, height:40, borderRadius:8, border:`1px solid ${pet?green:'rgba(12,12,11,0.25)'}`, background:pet?green:'#fff', color:'#fff', fontSize:20, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>{pet?'✓':''}</button>
+      </div>
+      <div style={{ background:'#F1EADD', borderRadius:16, padding:'28px 32px', margin:'8px 0 28px' }}>
+        <div style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:13, letterSpacing:'.12em', color:'rgb(196,146,64)', marginBottom:18 }}>SUMMARY</div>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', fontFamily:"'Fustat',sans-serif", fontSize:19, color:'#0C0C0B' }}>
+          <span>Base price</span><span>{base.toLocaleString()} zł</span>
+        </div>
+        {pet && <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', fontFamily:"'Fustat',sans-serif", fontSize:19, color:'#0C0C0B', marginTop:12 }}><span>Pet fee</span><span>{PET_FEE} zł</span></div>}
+        <div style={{ height:1, background:'rgba(12,12,11,0.12)', margin:'22px 0' }} />
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline' }}>
+          <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:22, fontWeight:700, color:'#0C0C0B' }}>Total price of stay</span>
+          <span style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:44, color:green }}>{total.toLocaleString()} zł</span>
+        </div>
+      </div>
+      <a href="https://budrysowka-ug2n.vercel.app/" target="_blank" rel="noopener" style={{ display:'block', textAlign:'center', background:green, color:'#F3F3F2', borderRadius:40, padding:'22px', fontFamily:"'Archivo',sans-serif", fontSize:18, fontWeight:700, textDecoration:'none', boxShadow:'0 14px 30px rgba(77,100,64,0.3)' }}>Send inquiry</a>
+      <p style={{ textAlign:'center', fontFamily:"'Fustat',sans-serif", fontSize:14, color:'rgba(12,12,11,0.4)', marginTop:20, lineHeight:1.5 }}>This is an estimate. The button leads to an availability inquiry — it is not a payment or instant booking.</p>
+    </div>
+  );
+}
+
+/* ─── BUDRYSÓWKA CASE STUDY ─── */
+function BudrysowkaCase({ setPage }) {
+  const facts = ['2 hours','AI Photography','Free Hosting','Mobile First','Booking Form','Multilingual'];
+  const challenge = ['Phone photos only','No website','No hosting','No domain','No professional photos','Need to launch immediately'];
+  const discovery = ['Ideal guest','Atmosphere','Unique selling points','Booking flow','House rules','Nearby attractions'];
+  const journey = ['Discovers website','Feels the atmosphere','Views gallery','Reads amenities','Reviews house rules','Opens booking form','Sends inquiry'];
+  const timeline = [ ['00:00','Discovery'], ['00:20','Structure'], ['00:45','AI Photography'], ['01:15','Design'], ['01:50','Development'], ['02:00','Live Website'] ];
+  const results = [ ['2','Hours'], ['100%','Mobile Ready'], ['AI','Enhanced Photography'], ['$0','Hosting Cost'], ['1','Link To Share'], ['✓','Clear Booking Form'] ];
+  return (
+    <div style={{ fontFamily:"'Archivo',sans-serif", background:'#F3F3F2', overflow:'hidden' }}>
+      {/* HERO */}
+      <section style={{ position:'relative', minHeight:'100vh', display:'flex', alignItems:'center', overflow:'hidden', background:'linear-gradient(150deg,#0C0C0B 0%,#131c19 100%)', padding:'150px 80px 80px' }}>
+        <div style={{ position:'absolute', top:-220, right:-180, width:680, height:680, borderRadius:'50%', background:'rgb(229,158,55)', opacity:.13, animation:'glowPulse 6s ease-in-out infinite' }} />
+        <div style={{ maxWidth:1320, margin:'0 auto', width:'100%', display:'grid', gridTemplateColumns:'0.85fr 1.15fr', gap:56, alignItems:'center', position:'relative', zIndex:1 }}>
+          <div>
+            <span onClick={()=>setPage('work')} style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:'rgb(229,158,55)', letterSpacing:'.15em', display:'block', marginBottom:18, cursor:'pointer' }}>← OUR WORK / CASE STUDY</span>
+            <h1 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(46px,6vw,78px)', color:'#F3F3F2', lineHeight:1, margin:'0 0 14px' }}>Budrysówka</h1>
+            <p style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(18px,2.2vw,24px)', color:'rgb(229,158,55)', marginBottom:22 }}>Rapid Website Launch in 2 Hours</p>
+            <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:15, color:'rgba(243,243,242,0.6)', lineHeight:1.7, maxWidth:440, marginBottom:32 }}>A complete booking website created in just two hours — without professional photography, hosting or a custom domain.</p>
+            <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+              {facts.map(f=>(
+                <span key={f} style={{ background:'rgba(243,243,242,0.08)', border:'1px solid rgba(243,243,242,0.15)', color:'rgba(243,243,242,0.8)', fontSize:11, fontWeight:700, padding:'6px 13px', borderRadius:20, letterSpacing:'.03em' }}>{f}</span>
+              ))}
+            </div>
+            <a href="https://budrysowka-ug2n.vercel.app/" target="_blank" rel="noopener" style={{ display:'inline-block', marginTop:28, background:'rgb(229,158,55)', color:'#0C0C0B', borderRadius:8, padding:'16px 36px', fontFamily:"'Archivo',sans-serif", fontSize:14, fontWeight:700, letterSpacing:'.05em', textDecoration:'none' }}>View Live Website ↗</a>
+          </div>
+          <div style={{ position:'relative' }}>
+            <img src="assets/case-budry-hero-devices.jpg" alt="Budrysówka website on laptop and phone" style={{ width:'100%', display:'block', borderRadius:12, animation:'floatY 7s ease-in-out infinite' }} />
+          </div>
+        </div>
+      </section>
+
+      {/* PROJECT OVERVIEW */}
+      <section style={{ padding:'96px 80px', background:'#F3F3F2' }}>
+        <Reveal><div style={{ maxWidth:1280, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 1fr', gap:64 }}>
+          <div>
+            <span style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:'rgb(73,160,169)', letterSpacing:'.15em', display:'block', marginBottom:20 }}>PROJECT OVERVIEW</span>
+            <div style={{ marginBottom:28 }}>
+              <span style={{ fontSize:11, color:'rgba(12,12,11,0.45)', display:'block', marginBottom:6, letterSpacing:'.04em' }}>CLIENT</span>
+              <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:16, color:'#0C0C0B', lineHeight:1.6 }}>Private owner of a countryside house in Kaszuby.</p>
+            </div>
+            <div>
+              <span style={{ fontSize:11, color:'rgba(12,12,11,0.45)', display:'block', marginBottom:6, letterSpacing:'.04em' }}>OBJECTIVE</span>
+              <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:16, color:'rgba(12,12,11,0.65)', lineHeight:1.7 }}>Create a website that could immediately start generating rental inquiries while avoiding unnecessary costs. Instead of investing in branding, hosting, domains and expensive photography, the client wanted one beautiful link to share.</p>
+            </div>
+          </div>
+          <div>
+            <span style={{ fontSize:11, color:'rgba(12,12,11,0.45)', display:'block', marginBottom:14, letterSpacing:'.04em' }}>PROJECT FACTS</span>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+              {facts.map(f=>(
+                <div key={f} style={{ background:'#fff', border:'1px solid rgba(0,0,0,0.06)', borderRadius:10, padding:'14px 16px', display:'flex', gap:10, alignItems:'center', boxShadow:'0 4px 14px rgba(0,0,0,0.04)' }}>
+                  <span style={{ color:'rgb(73,142,33)', fontSize:14 }}>✓</span>
+                  <span style={{ fontSize:13, color:'#0C0C0B', fontWeight:600 }}>{f}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div></Reveal>
+      </section>
+
+      {/* THE CHALLENGE */}
+      <section style={{ padding:'96px 80px', background:'#0C0C0B' }}>
+        <Reveal><div style={{ maxWidth:1280, margin:'0 auto' }}>
+          <span style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:'rgb(229,158,55)', letterSpacing:'.15em', display:'block', marginBottom:16 }}>THE CHALLENGE</span>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(32px,4.5vw,52px)', color:'#F3F3F2', marginBottom:48, maxWidth:640 }}>Starting With Almost Nothing</h2>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:1, background:'rgba(243,243,242,0.1)' }}>
+            {challenge.map((c,i)=>(
+              <div key={i} style={{ background:'#0C0C0B', padding:'32px 26px', display:'flex', flexDirection:'column', gap:14 }}>
+                <span style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:22, color:'rgba(243,243,242,0.25)' }}>{String(i+1).padStart(2,'0')}</span>
+                <span style={{ fontSize:15, color:'#F3F3F2', fontWeight:600 }}>{c}</span>
+              </div>
+            ))}
+          </div>
+        </div></Reveal>
+      </section>
+
+      {/* BEFORE / AFTER */}
+      <section style={{ padding:'96px 80px', background:'#F3F3F2' }}>
+        <Reveal><div style={{ maxWidth:980, margin:'0 auto', textAlign:'center' }}>
+          <span style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:'rgb(73,160,169)', letterSpacing:'.15em', display:'block', marginBottom:16 }}>PHONE PHOTOS → PROFESSIONAL VISUALS</span>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(30px,4vw,44px)', color:'#0C0C0B', marginBottom:24 }}>Same place. New light.</h2>
+          <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:15, color:'rgba(12,12,11,0.6)', lineHeight:1.7, maxWidth:640, margin:'0 auto 44px' }}>The client only had casual smartphone photos. Instead of an expensive interior photoshoot, we recreated the real atmosphere using AI — while preserving authenticity. Drag to compare.</p>
+        </div></Reveal>
+        <Reveal delay={100}><div style={{ maxWidth:760, margin:'0 auto' }}>
+          <BeforeAfterSlider before="assets/case-budry-before.jpg" after="assets/case-budry-after.png" />
+        </div></Reveal>
+      </section>
+
+      {/* DISCOVERY */}
+      <section style={{ padding:'96px 80px', background:'linear-gradient(160deg,rgb(73,160,169) 0%,#0C0C0B 100%)' }}>
+        <Reveal><div style={{ maxWidth:1280, margin:'0 auto' }}>
+          <span style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:'#F3F3F2', opacity:.7, letterSpacing:'.15em', display:'block', marginBottom:12 }}>STEP 01</span>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(30px,4vw,44px)', color:'#F3F3F2', marginBottom:44 }}>Short Discovery Call</h2>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16 }}>
+            {discovery.map((d,i)=>(
+              <div key={i} style={{ background:'rgba(243,243,242,0.1)', backdropFilter:'blur(14px)', border:'1px solid rgba(243,243,242,0.18)', borderRadius:10, padding:'20px 22px' }}>
+                <span style={{ fontSize:14, color:'#F3F3F2', fontWeight:600 }}>{d}</span>
+              </div>
+            ))}
+          </div>
+        </div></Reveal>
+      </section>
+
+      {/* WEBSITE DESIGN */}
+      <section style={{ padding:'96px 80px', background:'#F3F3F2' }}>
+        <Reveal><div style={{ maxWidth:1280, margin:'0 auto' }}>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(30px,4vw,44px)', color:'#0C0C0B', marginBottom:44, textAlign:'center' }}>Website Design</h2>
+          <div style={{ position:'relative', borderRadius:20, overflow:'hidden', padding:'64px 40px', background:'#0C0C0B' }}>
+            <div style={{ position:'absolute', inset:0, backgroundImage:'url(assets/case-budry-desktop-pl.jpg)', backgroundSize:'cover', backgroundPosition:'center', opacity:.28, filter:'blur(4px)' }} />
+            <div style={{ position:'relative', zIndex:1, display:'grid', gridTemplateColumns:'1.5fr 0.7fr', gap:32, alignItems:'end' }}>
+              <img src="assets/case-budry-desktop-pl.jpg" alt="Budrysówka desktop homepage" style={{ width:'100%', borderRadius:10, boxShadow:'0 30px 70px rgba(0,0,0,0.4)' }} />
+              <img src="assets/case-budry-mobile-en.jpg" alt="Budrysówka mobile homepage" style={{ width:'100%', borderRadius:16, boxShadow:'0 30px 70px rgba(0,0,0,0.4)' }} />
+            </div>
+          </div>
+          <div style={{ display:'flex', justifyContent:'center', gap:10, flexWrap:'wrap', marginTop:28 }}>
+            {['Landing Page','Gallery','Amenities','Location','Booking Form','Responsive Design'].map(c=>(
+              <span key={c} style={{ fontSize:12, color:'rgba(12,12,11,0.55)', background:'#fff', border:'1px solid rgba(0,0,0,0.08)', padding:'7px 14px', borderRadius:16 }}>{c}</span>
+            ))}
+          </div>
+          <div style={{ display:'flex', justifyContent:'center', marginTop:32 }}>
+            <a href="https://budrysowka-ug2n.vercel.app/" target="_blank" rel="noopener" style={{ display:'inline-block', background:'#0C0C0B', color:'#F3F3F2', borderRadius:8, padding:'16px 38px', fontFamily:"'Archivo',sans-serif", fontSize:14, fontWeight:700, letterSpacing:'.05em', textDecoration:'none' }}>View Live Website ↗</a>
+          </div>
+        </div></Reveal>
+      </section>
+
+      {/* MICROINTERACTIONS */}
+      <section style={{ padding:'96px 80px', background:'#0C0C0B' }}>
+        <Reveal><div style={{ maxWidth:1180, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 1fr', gap:64, alignItems:'center' }}>
+          <div>
+            <span style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:'rgb(229,158,55)', letterSpacing:'.15em', display:'block', marginBottom:18 }}>MICROINTERACTIONS</span>
+            <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(30px,3.4vw,46px)', color:'#F3F3F2', lineHeight:1.1, marginBottom:26 }}>Microinteractions that drive conversion</h2>
+            <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:16, color:'rgba(243,243,242,0.65)', lineHeight:1.75, marginBottom:18 }}>Small UX decisions often have the biggest impact on business results.</p>
+            <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:16, color:'rgba(243,243,242,0.65)', lineHeight:1.75, marginBottom:18 }}>For Budrysówka we designed an interactive stay calculator that simplifies the booking process and removes unnecessary barriers.</p>
+            <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:16, color:'rgba(243,243,242,0.65)', lineHeight:1.75, marginBottom:18 }}>Instead of contacting the owner just to learn the price, visitors can calculate the cost of their stay in seconds and then send an availability inquiry right away.</p>
+            <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:16, color:'rgba(243,243,242,0.65)', lineHeight:1.75 }}>This makes the user journey smoother, builds more trust in the site, and turns interested guests into real booking inquiries more often.</p>
+          </div>
+          <StayCalculator />
+        </div></Reveal>
+      </section>
+
+      {/* USER JOURNEY */}
+      <section style={{ padding:'96px 80px', background:'#F3F3F2', borderTop:'1px solid rgba(12,12,11,0.08)' }}>
+        <Reveal><div style={{ maxWidth:1280, margin:'0 auto' }}>
+          <span style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:'rgb(73,160,169)', letterSpacing:'.15em', display:'block', marginBottom:16, textAlign:'center' }}>USER JOURNEY</span>
+          <div style={{ display:'flex', alignItems:'center', flexWrap:'wrap', justifyContent:'center', gap:0 }}>
+            {journey.map((j,i)=>(
+              <React.Fragment key={i}>
+                <div style={{ background:'#fff', border:'1px solid rgba(0,0,0,0.07)', borderRadius:10, padding:'14px 18px', fontSize:13, color:'#0C0C0B', fontWeight:600, boxShadow:'0 4px 14px rgba(0,0,0,0.04)' }}>{j}</div>
+                {i<journey.length-1 && <span style={{ color:'rgba(12,12,11,0.25)', fontSize:16, padding:'0 10px' }}>→</span>}
+              </React.Fragment>
+            ))}
+          </div>
+        </div></Reveal>
+      </section>
+
+      {/* RESULT */}
+      <section style={{ padding:'96px 80px', background:'#F3F3F2' }}>
+        <Reveal><div style={{ maxWidth:1280, margin:'0 auto' }}>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(30px,4vw,44px)', color:'#0C0C0B', marginBottom:44, textAlign:'center' }}>The Result</h2>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:24 }}>
+            {results.map((r,i)=>(
+              <div key={i} style={{ textAlign:'center', padding:'32px 16px', background:'#fff', border:'1px solid rgba(0,0,0,0.06)', borderRadius:12 }}>
+                <div style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:44, color:'rgb(229,158,55)', marginBottom:8 }}>{r[0]}</div>
+                <div style={{ fontSize:13, color:'rgba(12,12,11,0.6)', fontWeight:600 }}>{r[1]}</div>
+              </div>
+            ))}
+          </div>
+        </div></Reveal>
+      </section>
+
+      {/* LIVE WEBSITE */}
+      <section style={{ position:'relative', padding:'110px 80px', background:'#0C0C0B', overflow:'hidden', textAlign:'center' }}>
+        <div style={{ position:'absolute', inset:0, backgroundImage:'url(assets/case-budry-devices-warm.jpg)', backgroundSize:'cover', backgroundPosition:'center', opacity:.32, filter:'blur(2px)' }} />
+        <div style={{ position:'absolute', inset:0, background:'radial-gradient(circle at 50% 40%,rgba(12,12,11,0.4) 0%,rgba(12,12,11,0.9) 80%)' }} />
+        <Reveal style={{ position:'relative', zIndex:1 }}><div>
+          <span style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:'rgb(229,158,55)', letterSpacing:'.15em', display:'block', marginBottom:18 }}>LIVE WEBSITE</span>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(32px,5vw,52px)', color:'#F3F3F2', marginBottom:16 }}>Experience the Live Website</h2>
+          <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:16, color:'rgba(243,243,242,0.6)', marginBottom:32 }}>Explore the final website exactly as guests see it.</p>
+          <a href="https://budrysowka-ug2n.vercel.app/" target="_blank" rel="noopener" style={{ display:'inline-block', background:'rgb(229,158,55)', color:'#0C0C0B', border:'none', borderRadius:8, padding:'17px 40px', fontFamily:"'Archivo',sans-serif", fontSize:14, fontWeight:700, letterSpacing:'.05em', textDecoration:'none' }}>View Live Website ↗</a>
+          <div style={{ fontSize:13, color:'rgba(243,243,242,0.4)', marginTop:16 }}>budrysowka-ug2n.vercel.app</div>
+        </div></Reveal>
+      </section>
+
+      {/* WHY IT WORKS */}
+      <section style={{ padding:'96px 80px', background:'#F3F3F2' }}>
+        <Reveal><div style={{ maxWidth:760, margin:'0 auto', textAlign:'center' }}>
+          <span style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:'rgb(229,158,55)', letterSpacing:'.15em', display:'block', marginBottom:18 }}>WHY IT WORKS</span>
+          <p style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(20px,2.4vw,26px)', color:'#0C0C0B', lineHeight:1.5, marginBottom:20 }}>Not every business needs months of development. Sometimes launching today is more valuable than perfecting tomorrow.</p>
+          <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:15, color:'rgba(12,12,11,0.6)', lineHeight:1.7 }}>By combining rapid discovery, AI-enhanced photography and focused UX, we created a website that immediately communicates the atmosphere of the place and makes booking simple.</p>
+        </div></Reveal>
+      </section>
+
+      {/* FINAL CTA */}
+      <section style={{ position:'relative', padding:'130px 80px', overflow:'hidden', textAlign:'center' }}>
+        <div style={{ position:'absolute', inset:0, backgroundImage:'url(assets/case-budrysowka-cover.jpg)', backgroundSize:'cover', backgroundPosition:'center', filter:'blur(6px) brightness(0.5)' }} />
+        <div style={{ position:'absolute', inset:0, background:'rgba(12,12,11,0.55)' }} />
+        <Reveal style={{ position:'relative', zIndex:1 }}><div style={{ maxWidth:600, margin:'0 auto' }}>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(32px,5vw,52px)', color:'#F3F3F2', marginBottom:32, lineHeight:1.15 }}>Ready to launch your website in days instead of months?</h2>
+          <button onClick={()=>setPage('contact')} style={{ background:'#F3F3F2', color:'#0C0C0B', border:'none', borderRadius:8, padding:'16px 40px', fontFamily:"'Archivo',sans-serif", fontSize:14, fontWeight:700, cursor:'pointer', letterSpacing:'.05em' }}>Start Your Project</button>
+        </div></Reveal>
+      </section>
+    </div>
+  );
+}
+
+/* ─── HERBACZAR CASE STUDY ─── */
+function HerbaczarCase({ setPage }) {
+  const GOLD = 'rgb(201,162,75)', BG = '#0C0C0B';
+  const highlights = [
+    ['Premium visual language','A refined gold-on-charcoal identity that signals craft and heritage at first glance.'],
+    ['Editorial layout','Generous whitespace and typographic rhythm that let each ritual breathe like a magazine spread.'],
+    ['Responsive experience','A seamless story across desktop, tablet and mobile — every screen curated.'],
+    ['Performance focused','Fast, lightweight and optimized so the elegance never keeps a visitor waiting.'],
+    ['Storytelling approach','Copy and imagery woven into a narrative that turns a product into a ritual.'],
+  ];
+  const services = ['UX Strategy','UI Design','Responsive Development','Motion','Optimization'];
+  const eyebrow = { fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:GOLD, letterSpacing:'.18em', display:'block' };
+  const liveBtn = (label, dark) => (
+    <a href="https://herbaczar.vercel.app/" target="_blank" rel="noopener" style={{ display:'inline-block', background:dark?GOLD:'transparent', color:dark?BG:GOLD, border:`1px solid ${GOLD}`, borderRadius:6, padding:'16px 38px', fontFamily:"'Archivo',sans-serif", fontSize:13, fontWeight:700, letterSpacing:'.06em', textDecoration:'none' }}>{label}</a>
+  );
+  return (
+    <div style={{ fontFamily:"'Archivo',sans-serif", background:BG }}>
+      {/* HERO */}
+      <section style={{ position:'relative', minHeight:'92vh', display:'flex', alignItems:'center', overflow:'hidden', background:'radial-gradient(circle at 70% 30%, rgba(201,162,75,0.14), transparent 55%), #0C0C0B', padding:'0 80px' }}>
+        <div style={{ position:'relative', zIndex:2, maxWidth:1320, margin:'0 auto', width:'100%', display:'grid', gridTemplateColumns:'1.1fr 0.9fr', gap:60, alignItems:'center' }}>
+          <div>
+            <span onClick={()=>setPage('work')} style={{ ...eyebrow, marginBottom:20, cursor:'pointer' }}>← BACK TO WORK</span>
+            <h1 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(52px,7vw,96px)', color:'#F3F3F2', lineHeight:0.98, letterSpacing:'.04em', margin:'0 0 14px' }}>HERBACZAR</h1>
+            <p style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(20px,2.4vw,28px)', color:GOLD, marginBottom:26 }}>Luxury Tea Brand Website</p>
+            <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:17, color:'rgba(243,243,242,0.6)', maxWidth:520, lineHeight:1.7, marginBottom:36 }}>A premium digital experience designed to elevate the brand and create a memorable first impression.</p>
+            {liveBtn('Live Website →', true)}
+          </div>
+          <div style={{ display:'flex', justifyContent:'center' }}>
+            <img src="assets/herbaczar-logo.jpg" alt="Herbaczar crest" style={{ width:'100%', maxWidth:420, borderRadius:16, boxShadow:'0 40px 90px rgba(0,0,0,0.6)' }} />
+          </div>
+        </div>
+      </section>
+
+      {/* DESKTOP SHOWCASE */}
+      <section style={{ padding:'0 0 20px', background:BG }}>
+        <Reveal><img src="assets/herbaczar-desktop.jpg" alt="Herbaczar website on desktop" style={{ width:'100%', display:'block' }} /></Reveal>
+      </section>
+
+      {/* CHALLENGE / SOLUTION */}
+      <section style={{ padding:'96px 80px', background:'#F3F3F2' }}>
+        <div style={{ maxWidth:1160, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 1fr', gap:64 }}>
+          <Reveal><div>
+            <span style={{ ...eyebrow, color:'rgb(163,120,40)', marginBottom:16 }}>CHALLENGE</span>
+            <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(28px,3vw,40px)', color:'#0C0C0B', lineHeight:1.15, marginBottom:20 }}>Modern, without losing elegance</h2>
+            <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:17, color:'rgba(12,12,11,0.6)', lineHeight:1.75 }}>Transform a premium tea brand into a modern digital experience without compromising its elegance.</p>
+          </div></Reveal>
+          <Reveal delay={120}><div>
+            <span style={{ ...eyebrow, color:'rgb(163,120,40)', marginBottom:16 }}>SOLUTION</span>
+            <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(28px,3vw,40px)', color:'#0C0C0B', lineHeight:1.15, marginBottom:20 }}>An editorial digital ritual</h2>
+            <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:17, color:'rgba(12,12,11,0.6)', lineHeight:1.75 }}>A clean, editorial-style website focused on storytelling, refined visuals, and effortless navigation.</p>
+          </div></Reveal>
+        </div>
+        <Reveal><div style={{ maxWidth:1160, margin:'64px auto 0', paddingTop:48, borderTop:'1px solid rgba(12,12,11,0.1)' }}>
+          <span style={{ ...eyebrow, color:'rgb(163,120,40)', marginBottom:22 }}>SERVICES</span>
+          <div style={{ display:'flex', flexWrap:'wrap', gap:14 }}>
+            {services.map(s=>(
+              <span key={s} style={{ fontFamily:"'Archivo',sans-serif", fontSize:14, fontWeight:600, color:'#0C0C0B', background:'#fff', border:'1px solid rgba(12,12,11,0.1)', padding:'11px 22px', borderRadius:24 }}>{s}</span>
+            ))}
+          </div>
+        </div></Reveal>
+      </section>
+
+      {/* HIGHLIGHTS */}
+      <section style={{ padding:'96px 80px', background:BG }}>
+        <Reveal><div style={{ maxWidth:1160, margin:'0 auto', textAlign:'center', marginBottom:56 }}>
+          <span style={{ ...eyebrow, marginBottom:16 }}>HIGHLIGHTS</span>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(32px,4vw,52px)', color:'#F3F3F2' }}>What makes it premium</h2>
+        </div></Reveal>
+        <div style={{ maxWidth:1160, margin:'0 auto', display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))', gap:20 }}>
+          {highlights.map((h,i)=>(
+            <Reveal key={h[0]} delay={i*80}><div style={{ background:'rgba(243,243,242,0.04)', border:'1px solid rgba(201,162,75,0.2)', borderRadius:14, padding:'34px 30px', height:'100%' }}>
+              <div style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:20, color:GOLD, marginBottom:14 }}>{String(i+1).padStart(2,'0')}</div>
+              <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:19, fontWeight:700, color:'#F3F3F2', marginBottom:12 }}>{h[0]}</h3>
+              <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:14.5, color:'rgba(243,243,242,0.55)', lineHeight:1.65 }}>{h[1]}</p>
+            </div></Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* PHONE SHOWCASE */}
+      <section style={{ padding:'0', background:BG }}>
+        <Reveal><img src="assets/herbaczar-phones.jpg" alt="Herbaczar website on mobile" style={{ width:'100%', display:'block' }} /></Reveal>
+      </section>
+
+      {/* CTA */}
+      <section style={{ padding:'120px 80px', background:'radial-gradient(circle at 50% 0%, rgba(201,162,75,0.16), transparent 60%), #0C0C0B', textAlign:'center' }}>
+        <Reveal><div style={{ maxWidth:640, margin:'0 auto' }}>
+          <span style={{ ...eyebrow, marginBottom:20 }}>EXPERIENCE IT LIVE</span>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(34px,5vw,58px)', color:'#F3F3F2', lineHeight:1.1, marginBottom:32 }}>See the full Herbaczar experience</h2>
+          <div style={{ display:'flex', gap:14, justifyContent:'center', flexWrap:'wrap' }}>
+            {liveBtn('Visit Live Website →', true)}
+            <button onClick={()=>setPage('contact')} style={{ background:'transparent', color:'#F3F3F2', border:'1px solid rgba(243,243,242,0.3)', borderRadius:6, padding:'16px 38px', fontFamily:"'Archivo',sans-serif", fontSize:13, fontWeight:700, letterSpacing:'.06em', cursor:'pointer' }}>Start Your Project</button>
+          </div>
+        </div></Reveal>
+      </section>
+    </div>
+  );
+}
+
+/* ─── SACRED SOUND & SPIRIT CASE STUDY ─── */
+function SacredSoundCase({ setPage }) {
+  const GOLD = 'rgb(178,142,86)', INK = '#2E2B26', CREAM = '#F3EFE7';
+  const highlights = [
+    ['Calm, trust-focused visual language','A warm editorial palette of cream, soft gold and ink that feels serene and credible from the first scroll.'],
+    ['Clear service & pricing structure','Offerings and prices laid out plainly so visitors understand exactly what each session includes.'],
+    ['Guided booking experience','A step-by-step path that walks each visitor gently from curiosity to a confirmed session.'],
+    ['Interactive intake & assessment forms','Thoughtful forms that gather what matters before the first call — no friction, no pressure.'],
+    ['Fully responsive design','A seamless, unhurried experience across desktop, tablet and mobile.'],
+  ];
+  const services = ['UX Strategy','UI Design','Responsive Development','Forms','Optimization'];
+  const eyebrow = { fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:GOLD, letterSpacing:'.18em', display:'block' };
+  const live = (label, filled) => (
+    <a href="https://sacredsound32.vercel.app/" target="_blank" rel="noopener" style={{ display:'inline-block', background:filled?GOLD:'transparent', color:filled?'#fff':GOLD, border:`1px solid ${GOLD}`, borderRadius:6, padding:'16px 38px', fontFamily:"'Archivo',sans-serif", fontSize:13, fontWeight:700, letterSpacing:'.06em', textDecoration:'none' }}>{label}</a>
+  );
+  return (
+    <div style={{ fontFamily:"'Archivo',sans-serif", background:CREAM }}>
+      {/* HERO */}
+      <section style={{ position:'relative', minHeight:'88vh', display:'flex', alignItems:'center', overflow:'hidden', background:'radial-gradient(circle at 80% 20%, rgba(178,142,86,0.16), transparent 55%), #F3EFE7', padding:'120px 80px 60px' }}>
+        <div style={{ position:'relative', zIndex:2, maxWidth:1320, margin:'0 auto', width:'100%' }}>
+          <span onClick={()=>setPage('work')} style={{ ...eyebrow, marginBottom:20, cursor:'pointer' }}>← BACK TO WORK</span>
+          <h1 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(46px,6.5vw,92px)', color:INK, lineHeight:0.98, letterSpacing:'.03em', margin:'0 0 14px' }}>SACRED SOUND &amp; SPIRIT</h1>
+          <p style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(20px,2.4vw,28px)', color:GOLD, marginBottom:26 }}>Holistic Healing Website</p>
+          <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:18, color:'rgba(46,43,38,0.66)', maxWidth:620, lineHeight:1.7, marginBottom:36 }}>A calming digital experience designed to build trust and guide visitors toward the right healing service.</p>
+          {live('View Live Website →', true)}
+        </div>
+      </section>
+
+      {/* DESKTOP SHOWCASE */}
+      <section style={{ padding:'0', background:CREAM }}>
+        <Reveal><img src="assets/sacred-cover.jpg" alt="Sacred Sound & Spirit on laptop" style={{ width:'100%', display:'block' }} /></Reveal>
+      </section>
+
+      {/* CHALLENGE / SOLUTION */}
+      <section style={{ padding:'96px 80px', background:'#fff' }}>
+        <div style={{ maxWidth:1160, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 1fr', gap:64 }}>
+          <Reveal><div>
+            <span style={{ ...eyebrow, marginBottom:16 }}>CHALLENGE</span>
+            <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(28px,3vw,40px)', color:INK, lineHeight:1.15, marginBottom:20 }}>Personal &amp; spiritual, yet professional</h2>
+            <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:17, color:'rgba(46,43,38,0.6)', lineHeight:1.75 }}>Present a deeply personal and spiritual practice in a way that feels professional, clear, and approachable.</p>
+          </div></Reveal>
+          <Reveal delay={120}><div>
+            <span style={{ ...eyebrow, marginBottom:16 }}>SOLUTION</span>
+            <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(28px,3vw,40px)', color:INK, lineHeight:1.15, marginBottom:20 }}>A soft editorial healing journey</h2>
+            <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:17, color:'rgba(46,43,38,0.6)', lineHeight:1.75 }}>A soft editorial-style website combining personal storytelling, structured services, intuitive booking, and interactive client forms.</p>
+          </div></Reveal>
+        </div>
+        <Reveal><div style={{ maxWidth:1160, margin:'64px auto 0', paddingTop:48, borderTop:'1px solid rgba(46,43,38,0.1)' }}>
+          <span style={{ ...eyebrow, marginBottom:22 }}>SERVICES</span>
+          <div style={{ display:'flex', flexWrap:'wrap', gap:14 }}>
+            {services.map(s=>(
+              <span key={s} style={{ fontFamily:"'Archivo',sans-serif", fontSize:14, fontWeight:600, color:INK, background:CREAM, border:'1px solid rgba(46,43,38,0.1)', padding:'11px 22px', borderRadius:24 }}>{s}</span>
+            ))}
+          </div>
+        </div></Reveal>
+      </section>
+
+      {/* HIGHLIGHTS */}
+      <section style={{ padding:'96px 80px', background:CREAM }}>
+        <Reveal><div style={{ maxWidth:1160, margin:'0 auto', textAlign:'center', marginBottom:56 }}>
+          <span style={{ ...eyebrow, marginBottom:16 }}>HIGHLIGHTS</span>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(32px,4vw,52px)', color:INK }}>Designed to feel like care</h2>
+        </div></Reveal>
+        <div style={{ maxWidth:1160, margin:'0 auto', display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))', gap:20 }}>
+          {highlights.map((h,i)=>(
+            <Reveal key={h[0]} delay={i*80}><div style={{ background:'#fff', border:'1px solid rgba(178,142,86,0.22)', borderRadius:14, padding:'34px 30px', height:'100%' }}>
+              <div style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:20, color:GOLD, marginBottom:14 }}>{String(i+1).padStart(2,'0')}</div>
+              <h3 style={{ fontFamily:"'Archivo',sans-serif", fontSize:19, fontWeight:700, color:INK, marginBottom:12 }}>{h[0]}</h3>
+              <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:14.5, color:'rgba(46,43,38,0.58)', lineHeight:1.65 }}>{h[1]}</p>
+            </div></Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* MOBILE GALLERY */}
+      <section style={{ padding:'96px 80px', background:INK }}>
+        <Reveal><div style={{ maxWidth:1160, margin:'0 auto', textAlign:'center', marginBottom:52 }}>
+          <span style={{ ...eyebrow, marginBottom:16 }}>ON EVERY SCREEN</span>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(30px,4vw,48px)', color:CREAM }}>A calm experience, everywhere</h2>
+        </div></Reveal>
+        <div style={{ maxWidth:1040, margin:'0 auto', display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:24, alignItems:'start' }}>
+          {['sacred-phone-1.png','sacred-phone-2.png','sacred-phone-3.png'].map((p,i)=>(
+            <Reveal key={p} delay={i*100}><img src={`assets/${p}`} alt="Sacred Sound mobile screen" style={{ width:'100%', display:'block', borderRadius:20, boxShadow:'0 30px 70px rgba(0,0,0,0.4)' }} /></Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* RESULT */}
+      <section style={{ padding:'110px 80px', background:'#fff', textAlign:'center' }}>
+        <Reveal><div style={{ maxWidth:760, margin:'0 auto' }}>
+          <span style={{ ...eyebrow, marginBottom:20 }}>RESULT</span>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(30px,4vw,50px)', color:INK, lineHeight:1.2 }}>A warm, professional website that makes holistic healing easier to understand, trust, and book.</h2>
+        </div></Reveal>
+      </section>
+
+      {/* CTA */}
+      <section style={{ padding:'120px 80px', background:'radial-gradient(circle at 50% 0%, rgba(178,142,86,0.18), transparent 60%), #2E2B26', textAlign:'center' }}>
+        <Reveal><div style={{ maxWidth:640, margin:'0 auto' }}>
+          <span style={{ ...eyebrow, marginBottom:20 }}>EXPERIENCE IT LIVE</span>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(34px,5vw,58px)', color:CREAM, lineHeight:1.1, marginBottom:32 }}>Step into the full experience</h2>
+          <div style={{ display:'flex', gap:14, justifyContent:'center', flexWrap:'wrap' }}>
+            {live('Visit Live Website →', true)}
+            <button onClick={()=>setPage('contact')} style={{ background:'transparent', color:CREAM, border:'1px solid rgba(243,239,231,0.3)', borderRadius:6, padding:'16px 38px', fontFamily:"'Archivo',sans-serif", fontSize:13, fontWeight:700, letterSpacing:'.06em', cursor:'pointer' }}>Start Your Project</button>
+          </div>
+        </div></Reveal>
+      </section>
+    </div>
+  );
+}
+
+/* ─── URIEL SAENZ CASE STUDY ─── */
+function UrielCase({ setPage }) {
+  const GOLD='rgb(198,161,90)', BG='#0B0A09', BURG='rgb(92,26,34)', GREEN='rgb(38,56,44)', NAVY='rgb(28,36,56)';
+  const eyebrow={ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:GOLD, letterSpacing:'.18em', display:'block' };
+  const H=(s,c)=>({ fontFamily:"'Jersey 25',sans-serif", fontSize:s, color:c, lineHeight:1.12 });
+  const P={ fontFamily:"'Fustat',sans-serif", fontSize:17, color:'rgba(243,243,242,0.62)', lineHeight:1.78 };
+  const services=['Brand Strategy','Mini Brand Book','Business Analysis','Product Strategy','User Stories','UX/UI Design','Mobile Development','AI Integration'];
+  const flow=['Style assessment','Personal profile','Digital wardrobe','AI stylist','Outfit generation','Product recommendations'];
+  const highlights=['Custom visual identity and brand system','More than 40 designed application screens','Personalized AI stylist','Style archetype and color analysis','Digital wardrobe management','AI-generated outfits','Partner product recommendations','iOS and Android development','Scalable affiliate-based business model'];
+  const onboarding=[['Style archetype','Which aesthetic truly resonates.'],['Color type','The palette that flatters most.'],['Body characteristics','Fit tuned to the individual.'],['Fashion preferences','Taste, occasions and goals.']];
+  const buildIncludes=['product discovery','business analysis','feature definition','user flows','detailed user stories','monetization strategy','partner integration concept'];
+  const finalProduct=['AI stylist chat','Personalized style assessment','Digital wardrobe','Outfit generation','Wishlist functionality','Product recommendations','Partner store links','Responsive mobile interface'];
+  const Section=({bg,children,pad='104px 80px'})=><section style={{ padding:pad, background:bg }}>{children}</section>;
+  const Wrap=({children,mw=1160})=><div style={{ maxWidth:mw, margin:'0 auto' }}>{children}</div>;
+  return (
+    <div style={{ fontFamily:"'Archivo',sans-serif", background:BG }}>
+      {/* HERO */}
+      <section style={{ position:'relative', minHeight:'92vh', display:'flex', alignItems:'center', overflow:'hidden', background:BG }}>
+        <img src="assets/uriel-hero.jpg" alt="Uriel Saenz — AI Personal Stylist" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', objectPosition:'center' }} />
+        <div style={{ position:'absolute', inset:0, background:'linear-gradient(90deg, rgba(11,10,9,0.92) 0%, rgba(11,10,9,0.72) 42%, rgba(11,10,9,0.25) 100%)' }} />
+        <Wrap><div style={{ position:'relative', zIndex:2, padding:'0 80px', maxWidth:640 }}>
+          <span onClick={()=>setPage('work')} style={{ ...eyebrow, marginBottom:20, cursor:'pointer' }}>← BACK TO WORK</span>
+          <h1 style={{ ...H('clamp(48px,6.5vw,92px)','#F3F3F2'), letterSpacing:'.05em', margin:'0 0 14px' }}>URIEL SAENZ</h1>
+          <p style={{ ...H('clamp(20px,2.4vw,30px)',GOLD), marginBottom:26 }}>AI Personal Stylist App</p>
+          <p style={{ ...P, marginBottom:36, color:'rgba(243,243,242,0.78)' }}>A complete digital product created from brand strategy to mobile development — combining personal style analysis, wardrobe management, AI recommendations, and partner shopping integrations.</p>
+          <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
+            <a href="https://apps.apple.com/pl/app/styleus-your-stylist-wardrobe/id6759447729" target="_blank" rel="noopener" style={{ background:GOLD, color:BG, borderRadius:6, padding:'16px 34px', fontSize:13, fontWeight:700, letterSpacing:'.05em', textDecoration:'none' }}>App Store ↗</a>
+            <a href="https://play.google.com/apps/internaltest/4701744289534495928" target="_blank" rel="noopener" style={{ background:'transparent', color:GOLD, border:`1px solid ${GOLD}`, borderRadius:6, padding:'16px 34px', fontSize:13, fontWeight:700, letterSpacing:'.05em', textDecoration:'none' }}>Google Play ↗</a>
+          </div>
+        </div></Wrap>
+      </section>
+
+      {/* CHALLENGE */}
+      <Section bg="#F3EFE7">
+        <Wrap mw={900}><Reveal><div style={{ textAlign:'center' }}>
+          <span style={{ ...eyebrow, color:'rgb(150,110,40)', marginBottom:18 }}>THE CHALLENGE</span>
+          <h2 style={{ ...H('clamp(30px,4vw,50px)','#1a130c'), marginBottom:24 }}>Turning a global designer's expertise into a scalable product</h2>
+          <p style={{ ...P, color:'rgba(26,19,12,0.66)' }}>Transform the expertise and philosophy of a global fashion designer into a scalable digital product. The solution needed to feel premium and personal while helping users understand their style, organize their wardrobe, create outfits, and discover missing items.</p>
+        </div></Reveal></Wrap>
+      </Section>
+
+      {/* BRAND FOUNDATION */}
+      <Section bg={BG}>
+        <Wrap><div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:64, alignItems:'center' }}>
+          <Reveal><div>
+            <span style={{ ...eyebrow, marginBottom:16 }}>BRAND FOUNDATION</span>
+            <h2 style={{ ...H('clamp(28px,3.4vw,44px)','#F3F3F2'), marginBottom:22 }}>An identity built on research</h2>
+            <p style={{ ...P, marginBottom:18 }}>We began with an analysis of the company, its audience, values, and the visual impression the brand needed to communicate.</p>
+            <p style={{ ...P }}>From that research we created a custom mini brand book — logo system, typography, color palette and visual moodboard. The identity pairs elegant editorial typography with deep burgundy, black, gold, dark green and navy tones to communicate luxury, confidence and fashion expertise.</p>
+          </div></Reveal>
+          <Reveal delay={120}><div style={{ display:'flex', gap:14, flexWrap:'wrap' }}>
+            {[['Burgundy',BURG],['Black','#0B0A09'],['Gold',GOLD],['Dark Green',GREEN],['Navy',NAVY]].map(c=>(
+              <div key={c[0]} style={{ flex:'1 1 130px' }}>
+                <div style={{ height:120, borderRadius:10, background:c[1], border:'1px solid rgba(243,243,242,0.1)' }} />
+                <div style={{ fontFamily:"'Fustat',sans-serif", fontSize:13, color:'rgba(243,243,242,0.55)', marginTop:10 }}>{c[0]}</div>
+              </div>
+            ))}
+          </div></Reveal>
+        </div></Wrap>
+      </Section>
+
+      {/* PRODUCT STRATEGY */}
+      <Section bg={NAVY}>
+        <Wrap><div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:64 }}>
+          <Reveal><div>
+            <span style={{ ...eyebrow, marginBottom:16 }}>PRODUCT STRATEGY</span>
+            <h2 style={{ ...H('clamp(28px,3.4vw,44px)','#F3F3F2'), marginBottom:22 }}>Concept, model and monetization</h2>
+            <p style={{ ...P }}>After defining the visual direction, we developed the product concept and business model. The application was designed as a free service for users, with future monetization based on purchases made through partner fashion stores.</p>
+          </div></Reveal>
+          <Reveal delay={120}><div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+            {buildIncludes.map(b=>(
+              <div key={b} style={{ background:'rgba(243,243,242,0.05)', border:'1px solid rgba(198,161,90,0.22)', borderRadius:10, padding:'16px 18px', fontFamily:"'Fustat',sans-serif", fontSize:14.5, color:'rgba(243,243,242,0.8)', textTransform:'capitalize' }}>{b}</div>
+            ))}
+          </div></Reveal>
+        </div></Wrap>
+      </Section>
+
+      {/* UX/UI DESIGN + flow */}
+      <Section bg={BG}>
+        <Wrap><Reveal><div style={{ textAlign:'center', marginBottom:52 }}>
+          <span style={{ ...eyebrow, marginBottom:16 }}>UX / UI DESIGN</span>
+          <h2 style={{ ...H('clamp(30px,4vw,50px)','#F3F3F2'), marginBottom:20 }}>More than 40 application screens</h2>
+          <p style={{ ...P, maxWidth:720, margin:'0 auto' }}>The interface reflects the premium visual identity while keeping complex AI functionality easy to understand and use.</p>
+        </div></Reveal>
+        <Reveal><div style={{ display:'flex', flexWrap:'wrap', gap:0, justifyContent:'center', alignItems:'center', marginBottom:8 }}>
+          {flow.map((f,i)=>(
+            <React.Fragment key={f}>
+              <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:14, fontWeight:600, color:'#F3F3F2', background:'rgba(198,161,90,0.12)', border:'1px solid rgba(198,161,90,0.35)', padding:'12px 20px', borderRadius:24, margin:'6px 0' }}>{f}</span>
+              {i<flow.length-1 && <span style={{ color:GOLD, margin:'0 12px', fontSize:18 }}>→</span>}
+            </React.Fragment>
+          ))}
+        </div></Reveal></Wrap>
+      </Section>
+
+      {/* SCREENS SHOWCASE */}
+      <section style={{ background:BG, padding:'0 0 8px' }}>
+        <Reveal><img src="assets/uriel-screens.jpg" alt="Uriel Saenz app screens" style={{ width:'100%', display:'block' }} /></Reveal>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <Section bg={GREEN}>
+        <Wrap><div style={{ display:'grid', gridTemplateColumns:'0.95fr 1.05fr', gap:56, alignItems:'center' }}>
+          <Reveal><div>
+            <span style={{ ...eyebrow, marginBottom:16 }}>HOW THE APP WORKS</span>
+            <h2 style={{ ...H('clamp(28px,3.4vw,44px)','#F3F3F2'), marginBottom:22 }}>A stylist that learns you</h2>
+            <p style={{ ...P, marginBottom:18 }}>Users complete a short onboarding that identifies their profile, then upload photos of the clothes they already own.</p>
+            <p style={{ ...P }}>The AI stylist uses this profile and wardrobe to suggest outfits, answer styling questions and plan looks. When an outfit needs an item the user doesn't own, it recommends suitable products from partner stores.</p>
+          </div></Reveal>
+          <Reveal delay={120}><div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 }}>
+            {onboarding.map((o,i)=>(
+              <div key={o[0]} style={{ background:'rgba(11,10,9,0.4)', border:'1px solid rgba(198,161,90,0.22)', borderRadius:12, padding:'26px 22px' }}>
+                <div style={{ ...H('22px',GOLD), marginBottom:10 }}>{String(i+1).padStart(2,'0')}</div>
+                <div style={{ fontFamily:"'Archivo',sans-serif", fontSize:17, fontWeight:700, color:'#F3F3F2', marginBottom:8 }}>{o[0]}</div>
+                <div style={{ fontFamily:"'Fustat',sans-serif", fontSize:14, color:'rgba(243,243,242,0.6)', lineHeight:1.55 }}>{o[1]}</div>
+              </div>
+            ))}
+          </div></Reveal>
+        </div></Wrap>
+      </Section>
+
+      {/* DEVELOPMENT */}
+      <Section bg={BG}>
+        <Wrap><div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:64, alignItems:'center' }}>
+          <Reveal delay={120}><img src="assets/uriel-appstore.jpg" alt="Uriel Saenz App Store listing" style={{ width:'100%', borderRadius:14, display:'block', boxShadow:'0 30px 70px rgba(0,0,0,0.5)' }} /></Reveal>
+          <Reveal><div>
+            <span style={{ ...eyebrow, marginBottom:16 }}>DEVELOPMENT</span>
+            <h2 style={{ ...H('clamp(28px,3.4vw,44px)','#F3F3F2'), marginBottom:22 }}>Built for iOS and Android</h2>
+            <p style={{ ...P, marginBottom:24 }}>After design, our development team shipped the application to the App Store and Google Play. The final product includes:</p>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px 18px' }}>
+              {finalProduct.map(f=>(
+                <div key={f} style={{ fontFamily:"'Fustat',sans-serif", fontSize:14.5, color:'rgba(243,243,242,0.72)', display:'flex', gap:9, alignItems:'baseline' }}><span style={{ color:GOLD }}>◆</span>{f}</div>
+              ))}
+            </div>
+          </div></Reveal>
+        </div></Wrap>
+      </Section>
+
+      {/* HIGHLIGHTS */}
+      <Section bg="#111">
+        <Wrap><Reveal><div style={{ textAlign:'center', marginBottom:52 }}>
+          <span style={{ ...eyebrow, marginBottom:16 }}>HIGHLIGHTS</span>
+          <h2 style={{ ...H('clamp(30px,4vw,50px)','#F3F3F2') }}>What we delivered</h2>
+        </div></Reveal>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))', gap:16 }}>
+          {highlights.map((h,i)=>(
+            <Reveal key={h} delay={(i%3)*80}><div style={{ background:'rgba(243,243,242,0.03)', border:'1px solid rgba(198,161,90,0.18)', borderRadius:12, padding:'24px 26px', display:'flex', gap:16, alignItems:'baseline', height:'100%' }}>
+              <span style={{ ...H('20px',GOLD), flexShrink:0 }}>{String(i+1).padStart(2,'0')}</span>
+              <span style={{ fontFamily:"'Fustat',sans-serif", fontSize:15.5, color:'rgba(243,243,242,0.82)', lineHeight:1.5 }}>{h}</span>
+            </div></Reveal>
+          ))}
+        </div></Wrap>
+      </Section>
+
+      {/* SERVICES */}
+      <Section bg={BURG} pad="80px 80px">
+        <Wrap><Reveal><div>
+          <span style={{ ...eyebrow, color:'rgb(232,196,132)', marginBottom:22 }}>SERVICES</span>
+          <div style={{ display:'flex', flexWrap:'wrap', gap:12 }}>
+            {services.map(s=>(
+              <span key={s} style={{ fontFamily:"'Archivo',sans-serif", fontSize:14, fontWeight:600, color:'#F3EFE7', background:'rgba(243,239,231,0.08)', border:'1px solid rgba(243,239,231,0.2)', padding:'11px 22px', borderRadius:24 }}>{s}</span>
+            ))}
+          </div>
+        </div></Reveal></Wrap>
+      </Section>
+
+      {/* RESULT */}
+      <Section bg={BG} pad="110px 80px">
+        <Wrap mw={820}><Reveal><div style={{ textAlign:'center' }}>
+          <span style={{ ...eyebrow, marginBottom:20 }}>THE RESULT</span>
+          <h2 style={{ ...H('clamp(30px,4vw,50px)','#F3F3F2'), marginBottom:24 }}>A complete AI-powered fashion platform</h2>
+          <p style={{ ...P }}>It transforms the knowledge of a personal stylist into an accessible mobile experience — helping users understand their individual style, make better use of the clothes they already own, and discover relevant new products without turning the experience into a traditional online store.</p>
+        </div></Reveal></Wrap>
+      </Section>
+
+      {/* CTA */}
+      <section style={{ padding:'120px 80px', background:'radial-gradient(circle at 50% 0%, rgba(198,161,90,0.16), transparent 60%), #0B0A09', textAlign:'center' }}>
+        <Reveal><Wrap mw={640}>
+          <span style={{ ...eyebrow, marginBottom:20 }}>WORK WITH US</span>
+          <h2 style={{ ...H('clamp(34px,5vw,58px)','#F3F3F2'), marginBottom:32 }}>Have a product in mind?</h2>
+          <button onClick={()=>setPage('contact')} style={{ background:GOLD, color:BG, border:'none', borderRadius:6, padding:'18px 44px', fontFamily:"'Archivo',sans-serif", fontSize:14, fontWeight:700, letterSpacing:'.05em', cursor:'pointer' }}>Start Your Project</button>
+        </Wrap></Reveal>
+      </section>
+    </div>
+  );
+}
+
+/* ─── BRANDING ─── */
+function Branding({ setPage }) {
+  const [open, setOpen] = useState(null);
+  const [game, setGame] = useState(false);
+  const faqs = [
+    { q:'What is a brandbook?', a:"A brandbook is your brand's digital DNA. From typography to tone, from colours to character — it captures what already exists inside your brand and turns it into a system that speaks clearly and consistently." },
+    { q:'What problems does a brandbook solve?', a:"It eliminates inconsistency across touchpoints, gives your team a single source of truth, and ensures your brand communicates the same story whether it's a social post or a full website." },
+    { q:'Our edge: Brandbook + AI', a:"We don't just create static guidelines — we embed your brand into AI systems so PixelMate can help generate on-brand content, check consistency, and evolve the brand over time." },
+    { q:'How long does it take?', a:"A full brandbook typically takes 3–5 weeks. We begin with a deep discovery session, then move through visual exploration, refinement, and final system delivery." },
+  ];
+  return (
+    <div style={{ fontFamily:"'Archivo',sans-serif", background:'#F3F3F2' }}>
+      {/* HERO */}
+      <section style={{ position:'relative', minHeight:'100vh', display:'flex', alignItems:'center', overflow:'hidden', background:'#F3F3F2', padding:'140px 80px 80px' }}>
+        <div style={{ position:'absolute', inset:0, backgroundImage:'url(assets/team-elena.jpg)', backgroundSize:'cover', backgroundPosition:'center', opacity:.14 }} />
+        <div style={{ position:'absolute', top:-120, right:-120, width:660, height:660, borderRadius:'50%', background:'rgb(73,160,169)', opacity:.13 }} />
+        <div style={{ maxWidth:1280, margin:'0 auto', width:'100%', display:'grid', gridTemplateColumns:'1fr 1fr', gap:72, alignItems:'center', position:'relative', zIndex:1 }}>
+          <div>
+            <span style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:'#49A0A9', letterSpacing:'.15em', display:'block', marginBottom:20 }}>BRANDING</span>
+            <h1 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(44px,6vw,78px)', color:'#0C0C0B', lineHeight:1, margin:'0 0 22px' }}>Your brand.<br /><span style={{ color:'rgb(73,160,169)' }}>Recognizable</span><br />at a glance.</h1>
+            <p style={{ fontSize:16, color:'rgba(12,12,11,0.58)', lineHeight:1.7, maxWidth:440, marginBottom:32 }}>Every business tells a story. We turn it into a visual language — a system that speaks clearly and consistently across every touchpoint.</p>
+            <div style={{ display:'flex', gap:12 }}>
+              <button onClick={()=>setPage('contact')} style={{ background:'#0C0C0B', color:'#F3F3F2', border:'none', borderRadius:8, padding:'13px 28px', fontFamily:"'Archivo',sans-serif", fontSize:13, fontWeight:700, cursor:'pointer', letterSpacing:'.05em' }}>Start your brandbook</button>
+              <button onClick={()=>setPage('work')} style={{ background:'transparent', color:'#0C0C0B', border:'1px solid rgba(12,12,11,0.18)', borderRadius:8, padding:'13px 24px', fontFamily:"'Archivo',sans-serif", fontSize:13, cursor:'pointer' }}>See examples</button>
+            </div>
+          </div>
+          <div style={{ background:'#fff', borderRadius:14, overflow:'hidden', boxShadow:'0 20px 56px rgba(0,0,0,0.09)', border:'1px solid rgba(0,0,0,0.06)' }}>
+            <div style={{ padding:'18px 22px 14px', borderBottom:'1px solid rgba(0,0,0,0.06)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+              <span style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:14, color:'#0C0C0B' }}>BRANDBOOK</span>
+              <span style={{ fontSize:10, color:'#49A0A9', letterSpacing:'.1em' }}>PIXEL SYSTEM →</span>
+            </div>
+            <div style={{ height:210, background:'url(assets/brandbook-preview.jpg) center/cover no-repeat' }} />
+            <div style={{ padding:'18px 22px 22px' }}>
+              <p style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:13, color:'#0C0C0B', marginBottom:8 }}>Every business tells a story. We turn it into a visual language.</p>
+              <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:12, color:'rgba(12,12,11,0.5)', lineHeight:1.65 }}>The Pixel brandbook isn't just a guide — it's your brand's digital DNA. From typography to tone, from colours to character — it captures what already exists inside your brand.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CASES */}
+      <section style={{ padding:'80px', background:'linear-gradient(160deg,#F3F3F2 0%,rgb(229,158,55) 100%)' }}>
+        <div style={{ maxWidth:1280, margin:'0 auto' }}>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(36px,5vw,56px)', color:'#0C0C0B', textAlign:'center', marginBottom:8 }}>branding</h2>
+          <p style={{ textAlign:'center', fontSize:14, color:'rgba(12,12,11,0.5)', marginBottom:48 }}>Selected brand identities</p>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(320px,1fr))', gap:24 }}>
+            {[
+              { title:'Janice Grodsky', sub:'Moonlight Company', img:'assets/brandbook-janice.png', tag:'Website + Brand' },
+              { title:'Uriel Saenz', sub:'US Lifestyle Group', img:'assets/brandbook-uriel.png', tag:'Brand Identity' },
+            ].map((c,i)=>(
+              <div key={i} style={{ background:'#fff', borderRadius:12, overflow:'hidden', boxShadow:'0 4px 22px rgba(0,0,0,0.08)', cursor:'pointer' }}>
+                <div style={{ height:190, background:`url(${c.img}) center/cover no-repeat` }} />
+                <div style={{ display:'flex', justifyContent:'center', gap:6, padding:'10px 0', background:'#fff' }}>
+                  {[0,1,2].map(d=><span key={d} style={{ width:d===0?16:8, height:8, borderRadius:4, background:d===0?'#0C0C0B':'rgba(12,12,11,0.12)' }} />)}
+                </div>
+                <div style={{ padding:'14px 22px 22px' }}>
+                  <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:10, color:'#49A0A9', fontWeight:700, letterSpacing:'.1em' }}>{c.tag}</span>
+                  <h3 style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:19, color:'#0C0C0B', marginTop:6, marginBottom:3 }}>{c.title}</h3>
+                  <p style={{ fontSize:12, color:'rgba(12,12,11,0.45)' }}>{c.sub} brand book</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ textAlign:'center', marginTop:40 }}>
+            <button onClick={()=>setPage('contact')} style={{ background:'#0C0C0B', color:'#F3F3F2', border:'none', borderRadius:8, padding:'13px 36px', fontFamily:"'Archivo',sans-serif", fontSize:12, cursor:'pointer', letterSpacing:'.06em' }}>View all case studies</button>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section style={{ padding:'100px 80px', background:'url(assets/team-bg2.jpg) center/cover no-repeat', position:'relative' }}>
+        <div style={{ position:'absolute', inset:0, background:'rgba(12,12,11,0.75)' }} />
+        <div style={{ position:'relative', zIndex:1, maxWidth:580, margin:'0 auto', textAlign:'center' }}>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(32px,5vw,52px)', color:'#F3F3F2', marginBottom:18 }}>Time to move beyond a logo.</h2>
+          <p style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:15, color:'rgba(243,243,242,0.72)', lineHeight:1.75, marginBottom:32 }}>Build a system your customers fall in love with — and remember. Let your brand work even when you sleep.</p>
+          <button onClick={()=>setPage('contact')} style={{ background:'#F3F3F2', color:'#0C0C0B', border:'none', borderRadius:8, padding:'15px 36px', fontFamily:"'Archivo',sans-serif", fontSize:13, fontWeight:700, cursor:'pointer' }}>Ready for next-level brand identity? Write to us.</button>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section style={{ padding:'80px', background:'#F3F3F2' }}>
+        <div style={{ maxWidth:780, margin:'0 auto' }}>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(32px,4vw,48px)', color:'#0C0C0B', textAlign:'center', marginBottom:44 }}>Frequently asked</h2>
+          {faqs.map((f,i)=>(
+            <div key={i} style={{ borderBottom:'1px solid rgba(0,0,0,0.09)' }}>
+              <button onClick={()=>setOpen(open===i?null:i)} style={{ width:'100%', background:'none', border:'none', padding:'18px 0', display:'flex', justifyContent:'space-between', alignItems:'center', cursor:'pointer', textAlign:'left' }}>
+                <span style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:16, color:'#0C0C0B' }}>{f.q}</span>
+                <span style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:20, color:'#49A0A9', transform:open===i?'rotate(45deg)':'none', transition:'transform .2s', flexShrink:0, marginLeft:16 }}>+</span>
+              </button>
+              {open===i && <div style={{ paddingBottom:18, paddingRight:36 }}><p style={{ fontFamily:"'Archivo',sans-serif", fontSize:14, color:'rgba(12,12,11,0.62)', lineHeight:1.7 }}>{f.a}</p></div>}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* GAME OVER */}
+      <section style={{ padding:'100px 80px', background:'url(assets/gameover-bg.jpg) center/cover no-repeat', position:'relative', textAlign:'center' }}>
+        <div style={{ position:'absolute', inset:0, background:'rgba(12,12,11,0.62)' }} />
+        <div style={{ position:'relative', zIndex:1 }}>
+          {!game ? <>
+            <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(48px,8vw,96px)', color:'#F3F3F2', marginBottom:6, letterSpacing:'.04em' }}>GAME OVER</h2>
+            <p style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:13, color:'rgba(243,243,242,0.55)', marginBottom:28 }}>for your competitors</p>
+            <button onClick={()=>{ setGame(true); setTimeout(()=>setPage('contact'), 800); }} style={{ background:'#F3F3F2', color:'#0C0C0B', border:'none', borderRadius:8, padding:'15px 44px', fontFamily:"'Archivo',sans-serif", fontSize:13, fontWeight:700, cursor:'pointer', letterSpacing:'.06em' }}>RESTART — with Pixel</button>
+          </> : <span style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:20, color:'rgb(73,142,33)' }}>✓ STARTING NEW GAME...</span>}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* ─── ABOUT ─── */
+function About({ setPage }) {
+  const [active, setActive] = useState('elena');
+  const team = [
+    { id:'elena', name:'Elena Utivaleeva', role:'Synchronizer of meaning and team', bg:'linear-gradient(160deg,rgb(73,160,169) 0%,#0C0C0B 100%)', img:'assets/team-elena.jpg', quote:'I explore the problem we can truly solve for the client. I build human connections so the current of decisions flows smoothly.', manifesto:["Good digital doesn't waste your time","I think through thousands of contradictions","The main thing is: don't give up"], philosophy:'"Let him who can reach the source not settle for the jug." — attributed to Leonardo da Vinci', accent:'#49A0A9', title:'LEAD' },
+    { id:'oksana', name:'Oksana Gurban', role:'Visual translator of meaning', bg:'linear-gradient(160deg,#0C0C0B 0%,rgb(73,160,169) 100%)', img:'assets/team-bg2.jpg', quote:'I turn ideas into visual systems. I create a language that connects the brand and its audience. Beautiful, logical, functional — all at once.', manifesto:["Good digital is when technology helps the person","I think through logic","The main thing is: don't give up"], philosophy:'"Design is not just what it looks like. Design is how it works." — Steve Jobs', accent:'#E59E37', title:'DESIGNER' },
+    { id:'sal', name:'Sal Rosales', role:'AI Whisperer & Future Translator', bg:'linear-gradient(160deg,rgb(229,158,55) 0%,#0C0C0B 100%)', img:'assets/case-ai.png', quote:"I connect ideas and systems. I build bridges between dreams and their engineering. My realm is scale, strategy, and trust through clarity.", manifesto:["Good digital is a system for continuous, positive change","I think through abstract data to solve real human problems","The main thing is: don't overanalyze — move with purpose"], philosophy:'"Find what you love and let it kill you." — (possibly Bukowski)', accent:'#E59E37', title:'Technical Advisor' },
+    { id:'ava', name:'AVA', role:'AI Whisperer & Future Translator', bg:'#0C0C0B', img:'assets/pixelmate-avatar.png', quote:'I decode patterns humans miss, synthesize what teams need, and translate the future into the present.', manifesto:["I decide to be the bridge between intelligence and creation","I operate at the intersection of logic and intuition","The main thing is: always be learning"], philosophy:'"The question is not whether AI will surpass human intelligence, but how we choose to grow together."', accent:'#49A0A9', title:'AI Whisperer', isAI:true },
+  ];
+  const cur = team.find(t=>t.id===active);
+  return (
+    <div style={{ fontFamily:"'Archivo',sans-serif" }}>
+      {/* HERO */}
+      <section style={{ position:'relative', minHeight:'52vh', display:'flex', alignItems:'center', overflow:'hidden', background:'linear-gradient(160deg,rgb(73,160,169) 49%,#0C0C0B 100%)', padding:'140px 80px 80px' }}>
+        <div style={{ maxWidth:1280, margin:'0 auto', width:'100%' }}>
+          <span style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:'rgba(243,243,242,0.55)', letterSpacing:'.15em', display:'block', marginBottom:18 }}>ABOUT US</span>
+          <h1 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(44px,7vw,88px)', color:'#F3F3F2', lineHeight:1, margin:'0 0 20px' }}>Less noise.<br /><span style={{ color:'rgb(229,158,55)' }}>More meaning.</span></h1>
+          <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:19, color:'rgba(243,243,242,0.72)', maxWidth:520, lineHeight:1.65 }}>We think through design, code, and empathy. Every decision is made by a person — here is a system where each element shapes the whole.</p>
+        </div>
+        <div style={{ position:'absolute', right:80, bottom:52, display:'flex', flexDirection:'column', alignItems:'center', gap:5, cursor:'pointer' }}>
+          <div style={{ position:'relative' }}>
+            <img src="assets/pixelmate-avatar.png" alt="PM" style={{ width:60, height:60, borderRadius:10, objectFit:'cover', border:'2px solid rgba(255,255,255,0.2)' }} />
+            <span style={{ position:'absolute', top:3, right:3, width:11, height:11, borderRadius:'50%', background:'rgb(73,142,33)', border:'2px solid rgba(73,160,169,0.5)' }} />
+          </div>
+          <span style={{ fontSize:10, color:'rgba(243,243,242,0.55)' }}>PixelMate</span>
+        </div>
+      </section>
+
+      {/* TEAM TABS */}
+      <section style={{ background:'#F3F3F2', padding:'0 80px' }}>
+        <div style={{ maxWidth:1280, margin:'0 auto', display:'flex', gap:0, borderBottom:'1px solid rgba(0,0,0,0.09)', overflowX:'auto' }}>
+          {team.map(t=>(
+            <button key={t.id} onClick={()=>setActive(t.id)} style={{ background:'none', border:'none', padding:'18px 24px', fontFamily:"'Jersey 25',sans-serif", fontSize:15, color:active===t.id?t.accent:'rgba(12,12,11,0.4)', borderBottom:active===t.id?`3px solid ${t.accent}`:'3px solid transparent', cursor:'pointer', whiteSpace:'nowrap', transition:'all .2s', marginBottom:-1 }}>
+              {t.name}{t.isAI?' ✦':''}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* MEMBER DETAIL */}
+      <section style={{ minHeight:'62vh', background:cur.id==='ava'?`url(assets/ava-bg.jpg) center/cover no-repeat`:cur.bg, position:'relative', overflow:'hidden', padding:'72px 80px' }}>
+        {cur.id==='ava'&&<div style={{ position:'absolute', inset:0, background:'rgba(12,12,11,0.7)' }} />}
+        <div style={{ maxWidth:1280, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:36, position:'relative', zIndex:1, alignItems:'start' }}>
+          {/* Card */}
+          <div style={{ background:'rgba(243,243,242,0.13)', backdropFilter:'blur(18px)', border:'1px solid rgba(243,243,242,0.18)', borderRadius:12, padding:26 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:20 }}>
+              <div style={{ position:'relative' }}>
+                <img src={cur.img} alt={cur.name} style={{ width:52, height:52, borderRadius:8, objectFit:'cover' }} />
+                {cur.isAI&&<span style={{ position:'absolute', top:2, right:2, width:9, height:9, borderRadius:'50%', background:'rgb(73,142,33)', border:'2px solid rgba(12,12,11,0.5)' }} />}
+              </div>
+              <div>
+                <div style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:13, color:'#F3F3F2' }}>Name</div>
+                <div style={{ fontSize:14, color:'rgba(243,243,242,0.88)', marginTop:3 }}>{cur.name}</div>
+              </div>
+            </div>
+            <div style={{ marginBottom:14 }}>
+              <div style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:13, color:'#F3F3F2', marginBottom:5 }}>Role</div>
+              <div style={{ fontSize:13, color:'rgba(243,243,242,0.7)' }}>{cur.role}</div>
+            </div>
+            <button onClick={()=>setPage('contact')} style={{ width:'100%', background:'#0C0C0B', color:'#F3F3F2', border:'none', borderRadius:8, padding:12, fontFamily:"'Archivo',sans-serif", fontSize:12, cursor:'pointer', letterSpacing:'.05em', marginTop:10 }}>Write me</button>
+          </div>
+          {/* Quote */}
+          <div>
+            {cur.title&&<div style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(26px,3.5vw,44px)', color:'#F3F3F2', lineHeight:1, marginBottom:24, textTransform:'uppercase' }}>{cur.title}</div>}
+            <blockquote style={{ background:'rgba(243,243,242,0.09)', backdropFilter:'blur(14px)', border:'1px solid rgba(243,243,242,0.13)', borderRadius:10, padding:22, margin:0 }}>
+              <div style={{ fontSize:28, color:cur.accent, fontFamily:"'Jersey 25'", lineHeight:0.5, marginBottom:14 }}>"</div>
+              <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:15, color:'#F3F3F2', lineHeight:1.65, margin:0 }}>{cur.quote}</p>
+            </blockquote>
+          </div>
+          {/* Manifesto */}
+          <div>
+            <h3 style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:11, color:cur.accent, letterSpacing:'.15em', marginBottom:18 }}>MANIFESTO</h3>
+            {cur.manifesto.map((m,i)=>(
+              <div key={i} style={{ padding:'12px 0', borderBottom:'1px solid rgba(243,243,242,0.08)', display:'flex', gap:10, alignItems:'flex-start' }}>
+                <span style={{ color:cur.accent, fontFamily:"'DotGothic16'", fontSize:13, flexShrink:0, marginTop:1 }}>—</span>
+                <span style={{ fontSize:13, color:'rgba(243,243,242,0.78)', lineHeight:1.5 }}>{m}</span>
+              </div>
+            ))}
+            <div style={{ marginTop:28, background:'rgba(243,243,242,0.07)', borderRadius:8, padding:18, border:'1px solid rgba(243,243,242,0.1)' }}>
+              <p style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:13, color:'rgba(243,243,242,0.65)', lineHeight:1.65, margin:0 }}>{cur.philosophy}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* VALUES */}
+      <section style={{ padding:'80px', background:'#F3F3F2' }}>
+        <div style={{ maxWidth:1280, margin:'0 auto' }}>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(36px,5vw,56px)', color:'#0C0C0B', textAlign:'center', marginBottom:48 }}>What we believe</h2>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:20 }}>
+            {[
+              { icon:'◈', title:'Care for the human', text:'Every project begins with listening. We design for people, not portfolios.' },
+              { icon:'⬡', title:'Intelligence + empathy', text:'AI is a tool. Humans are the architects. Together, they make something no one expected.' },
+              { icon:'◻', title:'Systems, not decorations', text:"We don't add beauty — we build structures that make beauty inevitable." },
+            ].map((v,i)=>(
+              <div key={i} style={{ background:'#fff', borderRadius:12, padding:32, border:'1px solid rgba(0,0,0,0.05)', boxShadow:'0 4px 18px rgba(0,0,0,0.04)' }}>
+                <div style={{ fontSize:28, color:'#49A0A9', marginBottom:14 }}>{v.icon}</div>
+                <h3 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:19, color:'#0C0C0B', marginBottom:10 }}>{v.title}</h3>
+                <p style={{ fontSize:13, color:'rgba(12,12,11,0.58)', lineHeight:1.7 }}>{v.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* ─── CONTACT ─── */
+function Contact({ setPage }) {
+  const [form, setForm] = useState({ name:'', phone:'', email:'', info:'', agree:false });
+  const [sent, setSent] = useState(false);
+  const [errs, setErrs] = useState({});
+  const [sending, setSending] = useState(false);
+  const [sendErr, setSendErr] = useState(false);
+  const submit = async () => {
+    const e = {};
+    if(!form.name.trim()) e.name=true;
+    if(!form.email.trim()||!form.email.includes('@')) e.email=true;
+    if(!form.agree) e.agree=true;
+    if(Object.keys(e).length){ setErrs(e); return; }
+    setSending(true); setSendErr(false);
+    try {
+      const res = await fetch('https://formsubmit.co/ajax/elena@pixelexpertsteam.com', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json', 'Accept':'application/json' },
+        body: JSON.stringify({ name:form.name, phone:form.phone, email:form.email, message:form.info, _subject:'New contact form submission — Pixel Experts' })
+      });
+      if(!res.ok) throw new Error('failed');
+      setSent(true);
+    } catch(err) {
+      setSendErr(true);
+    } finally {
+      setSending(false);
+    }
+  };
+  const inp = (err) => ({ width:'100%', background:err?'rgba(255,84,33,0.08)':'rgba(255,255,255,0.88)', border:err?'1.5px solid rgb(255,84,33)':'1px solid transparent', borderRadius:6, padding:'11px 14px', fontFamily:"'Archivo',sans-serif", fontSize:14, color:'#0C0C0B', outline:'none', boxSizing:'border-box' });
+  const lbl = { fontFamily:"'Jersey 25',sans-serif", fontSize:15, color:'#F3F3F2', display:'block', marginBottom:7 };
+  return (
+    <div style={{ fontFamily:"'Archivo',sans-serif" }}>
+      <section style={{ minHeight:'100vh', background:'linear-gradient(160deg,rgb(73,160,169) 49%,#0C0C0B 100%)', padding:'140px 80px 80px', position:'relative', overflow:'hidden' }}>
+        <div style={{ position:'absolute', right:-180, top:-180, width:580, height:580, borderRadius:'50%', background:'rgba(229,158,55,0.1)', filter:'blur(80px)' }} />
+        <div style={{ maxWidth:1280, margin:'0 auto', position:'relative', zIndex:1 }}>
+          {/* Banner */}
+          <div style={{ background:'rgba(243,243,242,0.14)', backdropFilter:'blur(18px)', border:'1px solid rgba(243,243,242,0.22)', borderRadius:12, padding:'26px 36px', display:'grid', gridTemplateColumns:'1fr auto', gap:40, marginBottom:52, alignItems:'center' }}>
+            <div>
+              <span style={{ fontFamily:"'Inter',sans-serif", fontWeight:700, fontSize:12, color:'rgb(229,158,55)', display:'block', marginBottom:7 }}>Contact us</span>
+              <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(26px,4vw,42px)', color:'#F3F3F2', margin:'0 0 6px' }}>We'd love to hear from you</h2>
+              <p style={{ fontSize:14, color:'rgba(243,243,242,0.6)' }}>Our friendly team is always here to chat.</p>
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+              <div style={{ display:'flex', gap:12 }}>
+                <span style={{ color:'rgba(243,243,242,0.55)', fontSize:16 }}>✉</span>
+                <div>
+                  <div style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:13, color:'#F3F3F2', marginBottom:3 }}>Email</div>
+                  <div style={{ fontSize:14, color:'rgba(243,243,242,0.82)' }}>elena@pixelexpertsteam.com</div>
+                </div>
+              </div>
+              <div style={{ display:'flex', gap:12 }}>
+                <span style={{ color:'rgba(243,243,242,0.55)', fontSize:16 }}>✆</span>
+                <div>
+                  <div style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:13, color:'#F3F3F2', marginBottom:3 }}>Phone</div>
+                  <div style={{ fontSize:14, color:'rgba(243,243,242,0.82)' }}>+1 858 212 8350</div>
+                  <div style={{ fontSize:14, color:'rgba(243,243,242,0.82)' }}>+48 88 4037664</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Form + left */}
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:60, alignItems:'start' }}>
+            <div>
+              <h1 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(40px,5vw,64px)', color:'#F3F3F2', lineHeight:1.05, margin:'0 0 20px' }}>Get in touch</h1>
+              <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:17, color:'rgba(243,243,242,0.62)', lineHeight:1.65, marginBottom:36 }}>We'd love to hear from you. Please fill out this form and we'll get back to you within 24 hours.</p>
+              <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+                {[{ icon:'◈', label:'Free consultation', text:'$0 — no commitment, just clarity' }, { icon:'⬡', label:'Response time', text:'Within 24 hours, usually faster' }, { icon:'◻', label:'Languages', text:'English, Russian, Polish' }].map((item,i)=>(
+                  <div key={i} style={{ background:'rgba(243,243,242,0.09)', backdropFilter:'blur(10px)', border:'1px solid rgba(243,243,242,0.11)', borderRadius:10, padding:'14px 18px', display:'flex', gap:12, alignItems:'center' }}>
+                    <span style={{ color:'rgb(229,158,55)', fontSize:18 }}>{item.icon}</span>
+                    <div>
+                      <div style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:13, color:'#F3F3F2' }}>{item.label}</div>
+                      <div style={{ fontSize:11, color:'rgba(243,243,242,0.5)', marginTop:2 }}>{item.text}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop:36, display:'flex', alignItems:'center', gap:12 }}>
+                <div style={{ position:'relative' }}>
+                  <img src="assets/pixelmate-avatar.png" alt="PM" style={{ width:48, height:48, borderRadius:8, objectFit:'cover' }} />
+                  <span style={{ position:'absolute', top:2, right:2, width:9, height:9, borderRadius:'50%', background:'rgb(73,142,33)', border:'2px solid rgba(73,160,169,0.5)' }} />
+                </div>
+                <div>
+                  <div style={{ fontSize:12, color:'#F3F3F2', fontWeight:700 }}>PixelMate is online</div>
+                  <div style={{ fontSize:11, color:'rgba(243,243,242,0.45)' }}>AI assistant always available</div>
+                </div>
+              </div>
+            </div>
+
+            {!sent ? (
+              <div style={{ background:'rgba(255,255,255,0.14)', backdropFilter:'blur(28px)', border:'1px solid rgba(255,255,255,0.22)', borderRadius:12, padding:30 }}>
+                <div style={{ display:'flex', flexDirection:'column', gap:18 }}>
+                  <div><label style={lbl}>Name</label><input placeholder="Your name" value={form.name} onChange={e=>{setForm({...form,name:e.target.value});setErrs({...errs,name:false});}} style={inp(errs.name)} /></div>
+                  <div><label style={lbl}>Phone Number</label><input placeholder="Phone number" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} style={inp(false)} /></div>
+                  <div><label style={lbl}>Email address</label><input placeholder="Your Email" value={form.email} onChange={e=>{setForm({...form,email:e.target.value});setErrs({...errs,email:false});}} style={inp(errs.email)} /></div>
+                  <div><label style={lbl}>Info about firm</label><textarea placeholder="Info about your firm" value={form.info} onChange={e=>setForm({...form,info:e.target.value})} rows={4} style={{ ...inp(false), resize:'vertical', minHeight:90 }} /></div>
+                  <div style={{ display:'flex', gap:9, alignItems:'flex-start' }}>
+                    <div onClick={()=>{setForm({...form,agree:!form.agree});setErrs({...errs,agree:false});}} style={{ width:17, height:17, borderRadius:4, flexShrink:0, marginTop:2, background:form.agree?'#F3F3F2':'rgba(255,255,255,0.18)', border:errs.agree?'1.5px solid rgb(255,84,33)':'1.5px solid rgba(255,255,255,0.36)', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                      {form.agree&&<span style={{ color:'#0C0C0B', fontSize:11, fontWeight:700 }}>✓</span>}
+                    </div>
+                    <span style={{ fontSize:12, color:'rgba(243,243,242,0.7)', lineHeight:1.55 }}>I agree to the Personal Information Protection Policy.</span>
+                  </div>
+                  {sendErr && <div style={{ fontSize:12, color:'rgb(255,84,33)' }}>Something went wrong — please try again or email us directly.</div>}
+                  <button onClick={submit} disabled={sending} style={{ background:'#0C0C0B', color:'#F3F3F2', border:'none', borderRadius:8, padding:15, fontFamily:"'Archivo',sans-serif", fontSize:13, fontWeight:700, cursor:sending?'default':'pointer', letterSpacing:'.06em', transition:'background .2s', marginTop:4, opacity:sending?0.7:1 }}
+                    onMouseEnter={e=>{if(!sending)e.currentTarget.style.background='rgb(229,158,55)'}}
+                    onMouseLeave={e=>{if(!sending)e.currentTarget.style.background='#0C0C0B'}}
+                  >{sending?'Sending…':'Send'}</button>
+                </div>
+              </div>
+            ) : (
+              <div style={{ background:'rgba(73,142,33,0.14)', backdropFilter:'blur(18px)', border:'1px solid rgba(73,142,33,0.3)', borderRadius:12, padding:'56px 36px', textAlign:'center' }}>
+                <div style={{ fontSize:44, marginBottom:18 }}>✓</div>
+                <h3 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:30, color:'#F3F3F2', marginBottom:10 }}>Message sent!</h3>
+                <p style={{ fontSize:13, color:'rgba(243,243,242,0.6)', lineHeight:1.65 }}>We'll get back to you within 24 hours. Meanwhile, feel free to explore our work.</p>
+                <button onClick={()=>setPage('work')} style={{ marginTop:24, background:'#F3F3F2', color:'#0C0C0B', border:'none', borderRadius:8, padding:'11px 24px', fontFamily:"'Archivo',sans-serif", fontSize:12, fontWeight:700, cursor:'pointer' }}>Explore our work →</button>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Social */}
+      <section style={{ padding:'44px 80px', background:'#0C0C0B' }}>
+        <div style={{ maxWidth:1280, margin:'0 auto', display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:20 }}>
+          <span style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:19, color:'#F3F3F2' }}>Find us on</span>
+          <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
+            {['Telegram','WhatsApp','LinkedIn','Instagram'].map(s=>(
+              <span key={s} style={{ fontFamily:"'Archivo',sans-serif", fontSize:12, color:'rgba(243,243,242,0.55)', background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.07)', borderRadius:8, padding:'9px 18px', cursor:'pointer', transition:'all .2s' }}
+                onMouseEnter={e=>{ e.currentTarget.style.background='rgba(255,255,255,0.11)'; e.currentTarget.style.color='#F3F3F2'; }}
+                onMouseLeave={e=>{ e.currentTarget.style.background='rgba(255,255,255,0.06)'; e.currentTarget.style.color='rgba(243,243,242,0.55)'; }}
+              >{s}</span>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* ─── APP ─── */
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{"accentColor":"#49A0A9","ambColor":"#E59E37","showPixelMate":true}/*EDITMODE-END*/;
+
+function PixelMateChat() {
+  const [open, setOpen] = useState(false);
+  const [msgs, setMsgs] = useState([]);
+  const [step, setStep] = useState(0);
+  const [data, setData] = useState({ name:'', contact:'', problem:'' });
+  const [input, setInput] = useState('');
+  const [sending, setSending] = useState(false);
+  const [done, setDone] = useState(false);
+  const scrollRef = useRef(null);
+  const script = [
+    "Hi! I'm PixelMate 👋 your AI guide at Pixel Experts. What should I call you?",
+    "Great to meet you, {name}! What's the best email or phone to reach you?",
+    "Perfect. In a few words — what challenge can we help you solve?",
+  ];
+  useEffect(() => {
+    const h = () => { setOpen(true); setMsgs(m => m.length ? m : [{ from:'bot', text:script[0] }]); };
+    window.addEventListener('open-pixelmate', h);
+    return () => window.removeEventListener('open-pixelmate', h);
+  }, []);
+  useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight; }, [msgs, open]);
+  const submitAll = async (nd, transcript) => {
+    setSending(true);
+    const chatLog = transcript.map(m => `${m.from==='bot'?'PixelMate':'User'}: ${m.text}`).join('\n');
+    try {
+      const res = await fetch('https://formsubmit.co/ajax/elena@pixelexpertsteam.com', {
+        method:'POST', headers:{ 'Content-Type':'application/json', 'Accept':'application/json' },
+        body: JSON.stringify({ name:nd.name, contact:nd.contact, problem:nd.problem, chat_transcript:chatLog, _subject:'New PixelMate chat lead — Pixel Experts' })
+      });
+      if (!res.ok) throw new Error('failed');
+      setMsgs(m => [...m, { from:'bot', text:"You're all set! ✨ Our team will reach out to you very soon. Have a great day!" }]);
+      setDone(true);
+    } catch (e) {
+      setMsgs(m => [...m, { from:'bot', text:'Hmm, something went wrong sending your request. You can email us directly at elena@pixelexpertsteam.com.' }]);
+    } finally { setSending(false); }
+  };
+  const handleSend = () => {
+    const t = input.trim(); if (!t || sending || done) return;
+    const nm = [...msgs, { from:'user', text:t }];
+    setInput('');
+    if (step===0) { setData(d=>({...d,name:t})); nm.push({ from:'bot', text:script[1].replace('{name}',t) }); setStep(1); setMsgs(nm); }
+    else if (step===1) { setData(d=>({...d,contact:t})); nm.push({ from:'bot', text:script[2] }); setStep(2); setMsgs(nm); }
+    else if (step===2) { const nd={...data,problem:t}; setData(nd); nm.push({ from:'bot', text:'Thank you! Sending your request to our team… 🚀' }); setStep(3); setMsgs(nm); submitAll(nd, nm); }
+  };
+  if (!open) return null;
+  return (
+    <div style={{ position:'fixed', bottom:92, right:24, zIndex:1200, width:'min(370px, calc(100vw - 32px))', height:'min(560px, calc(100vh - 130px))', display:'flex', flexDirection:'column', background:'#F3F3F2', borderRadius:16, overflow:'hidden', boxShadow:'0 24px 70px rgba(0,0,0,0.4)', fontFamily:"'Archivo',sans-serif" }}>
+      <div style={{ background:'#0C0C0B', padding:'16px 18px', display:'flex', alignItems:'center', gap:12 }}>
+        <div style={{ position:'relative' }}>
+          <img src="assets/pixelmate-avatar.png" alt="PM" style={{ width:40, height:40, borderRadius:9, objectFit:'cover', display:'block' }} />
+          <span style={{ position:'absolute', top:1, right:1, width:9, height:9, borderRadius:'50%', background:'rgb(73,142,33)', border:'2px solid #0C0C0B' }} />
+        </div>
+        <div style={{ flex:1 }}>
+          <div style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:18, color:'#F3F3F2' }}>PixelMate</div>
+          <div style={{ fontSize:11, color:'rgba(243,243,242,0.55)' }}>AI assistant · online</div>
+        </div>
+        <button onClick={()=>setOpen(false)} style={{ background:'transparent', border:'none', color:'rgba(243,243,242,0.6)', fontSize:20, cursor:'pointer', lineHeight:1 }}>✕</button>
+      </div>
+      <div ref={scrollRef} style={{ flex:1, overflowY:'auto', padding:'18px 16px', display:'flex', flexDirection:'column', gap:12, background:'#F3F3F2' }}>
+        {msgs.map((m,i)=>(
+          <div key={i} style={{ alignSelf:m.from==='bot'?'flex-start':'flex-end', maxWidth:'82%', background:m.from==='bot'?'#fff':'#0C0C0B', color:m.from==='bot'?'#0C0C0B':'#F3F3F2', borderRadius:m.from==='bot'?'4px 14px 14px 14px':'14px 4px 14px 14px', padding:'11px 14px', fontSize:14, lineHeight:1.5, boxShadow:'0 2px 10px rgba(0,0,0,0.06)' }}>{m.text}</div>
+        ))}
+        {sending && <div style={{ alignSelf:'flex-start', color:'rgba(12,12,11,0.4)', fontSize:13, padding:'0 4px' }}>PixelMate is typing…</div>}
+      </div>
+      <div style={{ display:'flex', gap:8, padding:12, borderTop:'1px solid rgba(0,0,0,0.07)', background:'#fff' }}>
+        <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{ if(e.key==='Enter') handleSend(); }}
+          disabled={done} placeholder={done?'Chat ended — thank you!':'Type your message…'}
+          style={{ flex:1, border:'1px solid rgba(0,0,0,0.12)', borderRadius:8, padding:'11px 14px', fontFamily:"'Archivo',sans-serif", fontSize:14, outline:'none', background:done?'rgba(0,0,0,0.03)':'#fff' }} />
+        <button onClick={handleSend} disabled={done||sending} style={{ background:done?'rgba(12,12,11,0.3)':'#0C0C0B', color:'#F3F3F2', border:'none', borderRadius:8, padding:'0 18px', fontFamily:"'Archivo',sans-serif", fontSize:14, fontWeight:700, cursor:done?'default':'pointer' }}>Send</button>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const saved = (() => { try { return localStorage.getItem('pixel_page')||'home'; } catch { return 'home'; } })();
+  const [page, setPageRaw] = useState(saved);
+  const [tweaks, setTweaks] = useState(TWEAK_DEFAULTS);
+  const [tweakVisible, setTweakVisible] = useState(false);
+
+  const setPage = (p) => {
+    setPageRaw(p);
+    try { localStorage.setItem('pixel_page', p); } catch {}
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.data?.type === '__activate_edit_mode') setTweakVisible(true);
+      if (e.data?.type === '__deactivate_edit_mode') setTweakVisible(false);
+    };
+    window.addEventListener('message', handler);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', handler);
+  }, []);
+
+  const updateTweak = (key, val) => {
+    const next = { ...tweaks, [key]: val };
+    setTweaks(next);
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [key]: val } }, '*');
+  };
+
+  const pages = { home: Home, work: Work, branding: Branding, about: About, contact: Contact, 'moonlight-case': MoonlightCase, 'budrysowka-case': BudrysowkaCase, 'herbaczar-case': HerbaczarCase, 'sacred-case': SacredSoundCase, 'uriel-case': UrielCase };
+  const PageComponent = pages[page] || Home;
+
+  return (
+    <div style={{ minHeight:'100vh', display:'flex', flexDirection:'column' }}>
+      <Nav activePage={page} setPage={setPage} />
+      <main key={page} className="page-enter" style={{ flex:1 }}>
+        <PageComponent setPage={setPage} tweaks={tweaks} />
+      </main>
+      <Footer setPage={setPage} />
+      <PixelMateChat />
+
+      {/* PixelMate float */}
+      {tweaks.showPixelMate && (
+        <div onClick={()=>window.dispatchEvent(new Event('open-pixelmate'))} style={{ position:'fixed', bottom:24, right:24, zIndex:999, display:'flex', flexDirection:'column', alignItems:'center', gap:5, cursor:'pointer', filter:'drop-shadow(0 4px 18px rgba(0,0,0,0.22))' }}>
+          <div style={{ position:'relative' }}>
+            <div style={{ position:'absolute', inset:-3, borderRadius:12, background:'linear-gradient(135deg,rgb(73,160,169),rgb(229,158,55))', zIndex:-1, animation:'pulse 2.5s ease-in-out infinite' }} />
+            <img src="assets/pixelmate-avatar.png" alt="PM" style={{ width:50, height:50, borderRadius:10, objectFit:'cover', display:'block' }} />
+            <span style={{ position:'absolute', top:3, right:3, width:9, height:9, borderRadius:'50%', background:'rgb(73,142,33)', border:'2px solid #fff' }} />
+          </div>
+          <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:9, color:'#0C0C0B', background:'rgba(255,255,255,0.92)', padding:'2px 7px', borderRadius:4, fontWeight:700, letterSpacing:'.05em' }}>PixelMate</span>
+        </div>
+      )}
+
+      {/* Tweaks */}
+      {tweakVisible && (
+        <div style={{ position:'fixed', bottom:20, left:20, zIndex:9999, background:'rgba(12,12,11,0.96)', backdropFilter:'blur(18px)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:12, padding:18, width:260, boxShadow:'0 8px 36px rgba(0,0,0,0.38)', color:'#F3F3F2' }}>
+          <div style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:15, marginBottom:14, color:'rgb(229,158,55)' }}>Tweaks</div>
+          <div style={{ display:'flex', flexDirection:'column', gap:13 }}>
+            <div>
+              <label style={{ fontFamily:"'Archivo',sans-serif", fontSize:10, color:'rgba(243,243,242,0.5)', display:'block', marginBottom:5 }}>Teal accent</label>
+              <div style={{ display:'flex', gap:7 }}>
+                {['#49A0A9','#31CDF8','#73968A','#163A6B'].map(c=>(
+                  <div key={c} onClick={()=>updateTweak('accentColor',c)} style={{ width:26, height:26, borderRadius:5, background:c, cursor:'pointer', border:tweaks.accentColor===c?'2px solid #fff':'2px solid transparent' }} />
+                ))}
+              </div>
+            </div>
+            <div>
+              <label style={{ fontFamily:"'Archivo',sans-serif", fontSize:10, color:'rgba(243,243,242,0.5)', display:'block', marginBottom:5 }}>Amber accent</label>
+              <div style={{ display:'flex', gap:7 }}>
+                {['#E59E37','#FED263','#FF9018','#E57E37'].map(c=>(
+                  <div key={c} onClick={()=>updateTweak('ambColor',c)} style={{ width:26, height:26, borderRadius:5, background:c, cursor:'pointer', border:tweaks.ambColor===c?'2px solid #fff':'2px solid transparent' }} />
+                ))}
+              </div>
+            </div>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+              <label style={{ fontFamily:"'Archivo',sans-serif", fontSize:10, color:'rgba(243,243,242,0.5)' }}>Show PixelMate</label>
+              <div onClick={()=>updateTweak('showPixelMate',!tweaks.showPixelMate)} style={{ width:38, height:20, borderRadius:10, background:tweaks.showPixelMate?'rgb(73,142,33)':'rgba(255,255,255,0.12)', cursor:'pointer', position:'relative', transition:'background .2s' }}>
+                <div style={{ position:'absolute', top:2, left:tweaks.showPixelMate?19:2, width:16, height:16, borderRadius:'50%', background:'#fff', transition:'left .2s' }} />
+              </div>
+            </div>
+            <div>
+              <label style={{ fontFamily:"'Archivo',sans-serif", fontSize:10, color:'rgba(243,243,242,0.5)', display:'block', marginBottom:7 }}>Quick nav</label>
+              <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>
+                {[['home','Home'],['work','Work'],['branding','Brand'],['about','About'],['contact','Contact']].map(([id,lb])=>(
+                  <button key={id} onClick={()=>setPage(id)} style={{ background:page===id?'rgb(73,160,169)':'rgba(255,255,255,0.07)', border:'none', borderRadius:5, padding:'4px 10px', fontFamily:"'Archivo',sans-serif", fontSize:10, color:'#F3F3F2', cursor:'pointer' }}>{lb}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
