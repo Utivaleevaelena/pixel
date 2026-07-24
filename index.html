@@ -36,6 +36,12 @@
 <script type="text/babel">
 const { useState, useEffect, useRef } = React;
 
+function useIsMobile(bp=760){
+  const [m,setM]=useState(typeof window!=='undefined'?window.innerWidth<=bp:false);
+  useEffect(()=>{ const on=()=>setM(window.innerWidth<=bp); window.addEventListener('resize',on); on(); return ()=>window.removeEventListener('resize',on); },[bp]);
+  return m;
+}
+
 /* ─── NAV ─── */
 function Nav({ activePage, setPage }) {
   const links = [
@@ -62,6 +68,32 @@ function Nav({ activePage, setPage }) {
   );
 }
 
+/* ─── NAV (mobile hamburger) ─── */
+function MobileNav({ activePage, setPage }) {
+  const [open, setOpen] = useState(false);
+  const links = [
+    { id:'home', label:'PiXEL' }, { id:'work', label:'Work' },
+    { id:'branding', label:'Branding' }, { id:'about', label:'About us' },
+    { id:'contact', label:'Contact' },
+  ];
+  const go = (id) => { setPage(id); setOpen(false); };
+  return (
+    <React.Fragment>
+      <button aria-label="Menu" onClick={()=>setOpen(o=>!o)} style={{ position:'fixed', top:16, right:16, zIndex:1300, width:46, height:46, borderRadius:10, border:'none', background:'rgba(255,255,255,0.9)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', boxShadow:'0 2px 16px rgba(0,0,0,0.18)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:5, cursor:'pointer' }}>
+        <span style={{ width:20, height:2, background:'#0C0C0B', borderRadius:2, transition:'transform .25s', transform:open?'translateY(7px) rotate(45deg)':'none' }} />
+        <span style={{ width:20, height:2, background:'#0C0C0B', borderRadius:2, transition:'opacity .2s', opacity:open?0:1 }} />
+        <span style={{ width:20, height:2, background:'#0C0C0B', borderRadius:2, transition:'transform .25s', transform:open?'translateY(-7px) rotate(-45deg)':'none' }} />
+      </button>
+      <div onClick={()=>setOpen(false)} style={{ position:'fixed', inset:0, zIndex:1250, background:'rgba(12,12,11,0.55)', backdropFilter:'blur(4px)', opacity:open?1:0, pointerEvents:open?'auto':'none', transition:'opacity .25s' }} />
+      <nav style={{ position:'fixed', top:0, right:0, bottom:0, zIndex:1280, width:'min(78vw,300px)', background:'#0C0C0B', boxShadow:'-12px 0 40px rgba(0,0,0,0.4)', transform:open?'translateX(0)':'translateX(100%)', transition:'transform .3s cubic-bezier(.3,.85,.3,1)', display:'flex', flexDirection:'column', padding:'92px 28px 32px', gap:6 }}>
+        {links.map(l=>(
+          <button key={l.id} onClick={()=>go(l.id)} style={{ textAlign:'left', background:activePage===l.id?'rgba(255,255,255,0.1)':'transparent', border:'none', borderRadius:8, padding:'14px 16px', fontFamily:"'Jersey 25',sans-serif", fontSize:24, color:activePage===l.id?'rgb(229,158,55)':'#F3F3F2', cursor:'pointer' }}>{l.label}</button>
+        ))}
+      </nav>
+    </React.Fragment>
+  );
+}
+
 /* ─── FOOTER ─── */
 function Footer({ setPage }) {
   const menu = [
@@ -71,7 +103,7 @@ function Footer({ setPage }) {
   ];
   const bottom = { fontFamily:"'Archivo',sans-serif", fontSize:13, color:'#F3F3F2', cursor:'pointer', textTransform:'uppercase', letterSpacing:'.03em' };
   return (
-    <footer style={{ background:'#0C0C0B', padding:'64px 80px 40px', color:'#F3F3F2', fontFamily:"'Archivo',sans-serif" }}>
+    <footer style={{ background:'#0C0C0B', padding:'64px clamp(22px,6vw,80px) 40px', color:'#F3F3F2', fontFamily:"'Archivo',sans-serif" }}>
       <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:34, marginBottom:56 }}>
         {menu.map(([label,to])=>(
           <span key={label} onClick={()=>setPage(to)} style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:26, color:'#F3F3F2', textTransform:'uppercase', letterSpacing:'.04em', cursor:'pointer' }}
@@ -80,12 +112,12 @@ function Footer({ setPage }) {
           >{label}</span>
         ))}
       </div>
-      <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between' }}>
-        <div style={{ display:'flex', gap:64 }}>
+      <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:24 }}>
+        <div style={{ display:'flex', gap:'clamp(24px,8vw,64px)' }}>
           <span style={bottom} onClick={()=>setPage('contact')}>Contact</span>
           <span style={bottom}>Legal</span>
         </div>
-        <div style={{ display:'flex', gap:56 }}>
+        <div style={{ display:'flex', gap:'clamp(20px,6vw,56px)' }}>
           <span style={bottom} onClick={()=>window.open('#','_blank')}>LinkedIn</span>
           <span style={bottom} onClick={()=>window.open('#','_blank')}>Instagram</span>
           <span style={bottom} onClick={()=>window.open('#','_blank')}>YouTube</span>
@@ -178,7 +210,7 @@ function Home({ setPage }) {
         <Ic setPage={setPage} x={607} y={677} src="mux-player-4-mry3jrnh-f93i.png" label="Business Automation" to="work" />
         <Ic setPage={setPage} x={485} y={841} src="mux-player-5-mry3jyyx-c01r.png" label="Workflow Optimization" to="work" />
         <Ic setPage={setPage} x={360} y={1090} src="vector-mry3d24q-j4ta.png" label="About us" to="about" />
-        <Ic setPage={setPage} x={1584} y={846} src="assets/home/icon-pixelmate.png" label="PixelMate" chat />
+        <Ic setPage={setPage} x={1584} y={846} src="assets/home/icon-pixelmate.jpg" label="PixelMate" chat />
         <SocialFolder />
         {/* info pop-up */}
         <div style={{ position:'absolute', left:729, top:866, width:462, borderRadius:8, background:'rgba(243,243,242,0.96)', backdropFilter:'blur(20px)', boxShadow:'0 30px 70px rgba(0,0,0,0.35)', padding:24, boxSizing:'border-box' }}>
@@ -231,7 +263,7 @@ function Home({ setPage }) {
           <p style={{ fontFamily:"'Archivo',sans-serif", fontSize:15, color:'rgba(12,12,11,0.75)', lineHeight:1.55 }}>My expectations have been exceeded. I never imagined the final outcome would be so precise, stylish, and full of life.<br /><br />What impressed me most was how the team asked the right questions and immersed themselves in my world — it felt like a true dialogue and deep understanding. I wholeheartedly recommend PIXEL to anyone who wants to build a brand identity that reflects their personality and values.<br /><br />And I want to extend a special thanks to the whole team — working with you has been an absolute pleasure.</p>
         </div>
         {/* testimonial: Uriel (sticky note) */}
-        <div style={{ position:'absolute', left:1160, top:darkTop+170, width:330, height:322, background:'url(assets/home/note-uriel.png) center / 100% 100% no-repeat', boxShadow:'0 20px 50px rgba(0,0,0,0.4)', padding:'26px 34px 34px', boxSizing:'border-box', overflow:'hidden', display:'flex', flexDirection:'column', justifyContent:'flex-end' }}>
+        <div style={{ position:'absolute', left:1160, top:darkTop+170, width:330, height:322, background:'#F3E9A8', borderRadius:'2px 2px 2px 24px', boxShadow:'0 20px 50px rgba(0,0,0,0.4)', padding:'26px 34px 34px', boxSizing:'border-box', overflow:'hidden', display:'flex', flexDirection:'column', justifyContent:'flex-end' }}>
           <div style={{ display:'flex', gap:8, marginBottom:8 }}>
             <span style={{ color:'rgba(12,12,11,0.5)', fontSize:12 }}>✕</span>
             <span style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:12, color:'#0C0C0B', lineHeight:1.25 }}>Uriel Saenz, CEO, The US Lifestyle Group LLC</span>
@@ -244,6 +276,125 @@ function Home({ setPage }) {
         <Ic setPage={setPage} x={360} y={darkTop+560} src="svg-mry3mg2d-zamd.png" label="About us" to="about" dark />
         <Ic setPage={setPage} x={1240} y={darkTop+540} size={215} round={12} src="mux-player-4-mry3o6uu-r16d.png" label="Check what you need" to="contact" dark />
       </Stage>
+    </div>
+  );
+}
+
+/* ─── HOME (mobile) ─── */
+function MIc({ src, label, to, setPage, dark, round=12, ext, face, chat, flat }) {
+  const onClick = () => { if (chat) window.dispatchEvent(new Event('open-pixelmate')); else if (ext) window.open(ext,'_blank'); else if (to) setPage(to); };
+  const shadow = flat ? 'none' : '0 6px 16px rgba(0,0,0,0.28)';
+  return (
+    <div onClick={onClick} style={{ display:'flex', flexDirection:'column', gap:7, alignItems:'center', cursor:'pointer' }}>
+      {face
+        ? <div style={{ width:76, height:76, borderRadius:round, overflow:'hidden', boxShadow:shadow }}>{face}</div>
+        : <img src={src} alt={label} style={{ width:76, height:76, borderRadius:round, objectFit:'cover', display:'block', boxShadow:shadow }} />}
+      <span style={{ textAlign:'center', fontFamily:"'Archivo',sans-serif", fontSize:12.5, fontWeight:600, lineHeight:1.2, color:dark?'#F3F3F2':'#0C0C0B', textShadow:dark?'0 1px 5px rgba(0,0,0,0.5)':'none' }}>{label}</span>
+    </div>
+  );
+}
+
+function HomeMobile({ setPage }) {
+  const TEAL='rgb(73,160,169)', ORANGE='rgb(229,158,55)', INK='#0C0C0B', CREAM='#F3F3F2';
+  const grid3 = { display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:20, justifyItems:'center' };
+  const heading = { fontFamily:"'Jersey 25',sans-serif", textTransform:'uppercase', textAlign:'center', letterSpacing:'.02em', margin:0 };
+  const moonFace = (
+    <div style={{ width:'100%', height:'100%', background:'rgb(74,138,43)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:4 }}>
+      <div style={{ width:16, height:16, borderRadius:'50%', border:'1.5px solid rgb(214,178,94)', position:'relative' }}><span style={{ position:'absolute', top:-2, left:'50%', width:3, height:3, borderRadius:'50%', background:'rgb(214,178,94)', transform:'translateX(-50%)' }} /></div>
+      <span style={{ fontFamily:"'Marcellus SC','Marcellus',serif", fontSize:12, letterSpacing:'.04em', color:'rgb(232,226,214)' }}>MOONLIGHT</span>
+      <span style={{ fontFamily:"'Fustat',sans-serif", fontSize:6, letterSpacing:'.25em', color:'rgb(214,178,94)' }}>COMPASS</span>
+    </div>
+  );
+  const placeFace = (
+    <div style={{ width:'100%', height:'100%', background:'rgb(73,160,169)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+      <div style={{ background:'#0C0C0B', borderRadius:8, padding:'8px 10px', display:'flex', flexDirection:'column', alignItems:'center', lineHeight:1 }}>
+        <span style={{ fontFamily:"'DotGothic16',monospace", fontSize:12, color:'rgb(229,158,55)' }}>PLACE</span>
+        <span style={{ fontFamily:"'DotGothic16',monospace", fontSize:12, color:'rgb(73,160,169)' }}>FOR YOU</span>
+      </div>
+    </div>
+  );
+  return (
+    <div style={{ fontFamily:"'Archivo',sans-serif", background:INK, overflowX:'hidden' }}>
+
+      {/* ── TEAL: hero + icons ── */}
+      <section style={{ background:TEAL, padding:'0 0 42px', position:'relative', overflow:'hidden' }}>
+        <div style={{ position:'absolute', top:-72, left:'-20%', width:'140%', height:120, borderRadius:'0 0 50% 50%', boxShadow:'0 8px 44px 6px rgba(229,158,55,0.75)', borderBottom:'2px solid rgba(229,158,55,0.85)', pointerEvents:'none' }} />
+        <div style={{ margin:'16px 14px 32px', background:CREAM, borderRadius:14, overflow:'hidden', boxShadow:'0 24px 60px rgba(0,0,0,0.35)', position:'relative', zIndex:1 }}>
+          <div style={{ display:'flex', alignItems:'center', padding:'11px 16px', borderBottom:'1px solid rgba(0,0,0,0.08)' }}>
+            <span style={{ fontSize:14, color:'rgba(12,12,11,0.5)', width:16 }}>✕</span>
+            <span style={{ flex:1, textAlign:'center', fontWeight:700, letterSpacing:'.2em', fontSize:14, color:INK }}>PIXEL</span>
+            <span style={{ width:16 }} />
+          </div>
+          <img src="assets/home/hero-bg.jpg" alt="AI brand experience" style={{ width:'100%', display:'block' }} />
+          <div style={{ padding:'20px 20px 22px' }}>
+            <div style={{ fontWeight:700, fontSize:16, marginBottom:12, color:INK }}>Your brand. Enhanced by AI.</div>
+            <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:8 }}>
+              <span style={{ fontSize:16 }}>⚠️</span>
+              <span style={{ fontWeight:700, fontSize:14, color:INK, letterSpacing:'.02em' }}>PRODUKT INFORMATION SHEET</span>
+            </div>
+            <p style={{ fontSize:14, color:'rgba(12,12,11,0.65)', lineHeight:1.5, margin:'0 0 16px' }}>We create brand experiences where intelligence and design work as one.</p>
+            <button onClick={()=>setPage('contact')} style={{ display:'block', width:'100%', background:'rgba(12,12,11,0.05)', color:INK, border:'none', borderRadius:8, padding:15, fontSize:13, letterSpacing:'.1em', textTransform:'uppercase', cursor:'pointer', marginBottom:10 }}>START</button>
+            <button onClick={()=>setPage('contact')} style={{ display:'block', width:'100%', background:INK, color:CREAM, border:'none', borderRadius:8, padding:15, fontSize:13, letterSpacing:'.1em', textTransform:'uppercase', cursor:'pointer' }}>Try $ 0 consultation</button>
+          </div>
+        </div>
+
+        <div style={{ ...grid3, padding:'0 16px' }}>
+          <MIc setPage={setPage} chat src="assets/home/icon-pixelmate.jpg" label="PixelMate" />
+          <MIc setPage={setPage} ext="#" src="vector-mry3d7lh-bxzw.png" label="Social media" round={10} />
+          <MIc setPage={setPage} ext="#" src="assets/home/ic-linkedin.png" label="Linkedin" round={16} />
+          <MIc setPage={setPage} ext="#" src="assets/home/ic-whatsapp.png" label="WhatsApp" round={16} />
+          <MIc setPage={setPage} ext="#" src="assets/home/ic-instagram.png" label="Instagram" round={16} />
+          <MIc setPage={setPage} to="work" src="assets/home/ic-ai-agents.png" label="AI Agents and chatbots" />
+          <MIc setPage={setPage} to="work" src="assets/home/ic-sites.png" label="SITES and APP’s" />
+          <MIc setPage={setPage} to="branding" src="group-46011-mry3ji3z-2wzi.png" label="Branding" round={16} />
+          <MIc setPage={setPage} to="work" src="assets/home/check-robot.png" label="Business Automation" />
+          <MIc setPage={setPage} to="work" src="mux-player-5-mry3jyyx-c01r.png" label="Workflow Optimization" />
+          <MIc setPage={setPage} to="about" src="vector-mry3d24q-j4ta.png" label="About us" />
+        </div>
+      </section>
+
+      {/* ── ORANGE: services ── */}
+      <section style={{ background:ORANGE, padding:'40px 18px 44px' }}>
+        <h2 style={{ ...heading, fontSize:26, color:CREAM, marginBottom:20 }}>Services and use cases</h2>
+        <button onClick={()=>setPage('work')} style={{ display:'block', width:'100%', maxWidth:340, margin:'0 auto 30px', background:INK, color:CREAM, border:'none', borderRadius:8, padding:15, fontSize:12, letterSpacing:'.1em', textTransform:'uppercase', cursor:'pointer' }}>View all case studies</button>
+        <div style={{ ...grid3, padding:'0 4px' }}>
+          <MIc setPage={setPage} to="moonlight-case" face={moonFace} label="Janice website" />
+          <MIc setPage={setPage} to="branding" src="group-46011-2-mry3lx9q-hm54.png" label="Branding" />
+          <MIc setPage={setPage} to="uriel-case" src="mux-player-7-mry3m4ep-0jwu.png" label="AI Personal Stylist App" />
+          <MIc setPage={setPage} to="budrysowka-case" src="assets/case-budrysowka-cover.jpg" label="Budrysówka website" />
+          <MIc setPage={setPage} to="herbaczar-case" src="-copy-mry40rgx-xyyo.jpg" label="Herbaczar website" />
+          <MIc setPage={setPage} to="sacred-case" src="assets/sacred-cover.jpg" label="Sacred Sound &amp; Spirit website" />
+          <MIc setPage={setPage} to="contact" flat round={8} src="vintage-pager-display-message-copy-1-mry3ni2x-fem8.png" label="Check what you need" />
+          <MIc setPage={setPage} to="work" src="assets/home/ic-sites.png" label="SITES and APP’s" />
+          <MIc setPage={setPage} to="contact" face={placeFace} round={16} label="Place for you" />
+        </div>
+      </section>
+
+      {/* ── DARK: results ── */}
+      <section style={{ background:'url(assets/home/dark-bg.jpg) center / cover no-repeat', backgroundColor:'#141a1a', padding:'42px 18px 48px' }}>
+        <h2 style={{ ...heading, fontSize:26, color:CREAM, marginBottom:26 }}>Rresults come first</h2>
+
+        <div style={{ background:'rgba(243,243,242,0.94)', borderRadius:8, padding:'18px 20px', marginBottom:20 }}>
+          <div style={{ display:'flex', gap:10, marginBottom:12 }}>
+            <span style={{ color:'rgba(12,12,11,0.4)', fontSize:13 }}>✕</span>
+            <span style={{ fontWeight:700, fontSize:14, color:INK, lineHeight:1.3 }}>Janice Grodsky, Founder &amp; CEO, Moonlight Company</span>
+          </div>
+          <p style={{ fontSize:13.5, color:'rgba(12,12,11,0.75)', lineHeight:1.55, margin:0 }}>My expectations have been exceeded. I never imagined the final outcome would be so precise, stylish, and full of life.<br /><br />What impressed me most was how the team asked the right questions and immersed themselves in my world — it felt like a true dialogue and deep understanding. I wholeheartedly recommend PIXEL to anyone who wants to build a brand identity that reflects their personality and values.<br /><br />And I want to extend a special thanks to the whole team — working with you has been an absolute pleasure.</p>
+        </div>
+
+        <div style={{ background:'#F3E9A8', borderRadius:'2px 2px 2px 22px', padding:'18px 20px 22px', marginBottom:30, boxShadow:'0 16px 40px rgba(0,0,0,0.4)' }}>
+          <div style={{ display:'flex', gap:8, marginBottom:10 }}>
+            <span style={{ color:'rgba(12,12,11,0.5)', fontSize:12 }}>✕</span>
+            <span style={{ fontWeight:700, fontSize:13, color:INK, lineHeight:1.25 }}>Uriel Saenz, CEO, The US Lifestyle Group LLC</span>
+          </div>
+          <p style={{ fontSize:12.5, color:'rgba(12,12,11,0.82)', lineHeight:1.45, margin:0 }}>Working with PIXEL was a true example of transparent and creative partnership. The team adapted flexibly at every stage and did everything to deeply understand my brand. The result is a brand book where I can truly recognize myself and my company. It’s not just design — it’s the essence of The US Lifestyle Group. I recommend PIXEL to anyone looking for a team that not only creates visuals, but also builds a way of working tailored to you.</p>
+        </div>
+
+        <div style={{ display:'flex', justifyContent:'center', gap:36 }}>
+          <MIc setPage={setPage} to="about" dark src="svg-mry3mg2d-zamd.png" label="About us" />
+          <MIc setPage={setPage} to="contact" dark round={12} src="mux-player-4-mry3o6uu-r16d.png" label="Check what you need" />
+        </div>
+      </section>
     </div>
   );
 }
@@ -935,7 +1086,7 @@ function HerbaczarCase({ setPage }) {
             {liveBtn('Live Website →', true)}
           </div>
           <div style={{ display:'flex', justifyContent:'center' }}>
-            <img src="assets/herbaczar-logo.jpg" alt="Herbaczar crest" style={{ width:'100%', maxWidth:420, borderRadius:16, boxShadow:'0 40px 90px rgba(0,0,0,0.6)' }} />
+            <img src="assets/herbaczar-logo-sm.jpg" alt="Herbaczar crest" style={{ width:'100%', maxWidth:420, borderRadius:16, boxShadow:'0 40px 90px rgba(0,0,0,0.6)' }} />
           </div>
         </div>
       </section>
@@ -1350,7 +1501,7 @@ function Branding({ setPage }) {
           <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(320px,1fr))', gap:24 }}>
             {[
               { title:'Janice Grodsky', sub:'Moonlight Company', img:'assets/brandbook-janice.png', tag:'Website + Brand' },
-              { title:'Uriel Saenz', sub:'US Lifestyle Group', img:'assets/brandbook-uriel.png', tag:'Brand Identity' },
+              { title:'Uriel Saenz', sub:'US Lifestyle Group', img:'assets/brandbook-uriel-sm.jpg', tag:'Brand Identity' },
             ].map((c,i)=>(
               <div key={i} style={{ background:'#fff', borderRadius:12, overflow:'hidden', boxShadow:'0 4px 22px rgba(0,0,0,0.08)', cursor:'pointer' }}>
                 <div style={{ height:190, background:`url(${c.img}) center/cover no-repeat` }} />
@@ -1419,7 +1570,7 @@ function About({ setPage }) {
     { id:'elena', name:'Elena Utivaleeva', role:'Synchronizer of meaning and team', bg:'linear-gradient(160deg,rgb(73,160,169) 0%,#0C0C0B 100%)', img:'assets/team-elena.jpg', quote:'I explore the problem we can truly solve for the client. I build human connections so the current of decisions flows smoothly.', manifesto:["Good digital doesn't waste your time","I think through thousands of contradictions","The main thing is: don't give up"], philosophy:'"Let him who can reach the source not settle for the jug." — attributed to Leonardo da Vinci', accent:'#49A0A9', title:'LEAD' },
     { id:'oksana', name:'Oksana Gurban', role:'Visual translator of meaning', bg:'linear-gradient(160deg,#0C0C0B 0%,rgb(73,160,169) 100%)', img:'assets/team-bg2.jpg', quote:'I turn ideas into visual systems. I create a language that connects the brand and its audience. Beautiful, logical, functional — all at once.', manifesto:["Good digital is when technology helps the person","I think through logic","The main thing is: don't give up"], philosophy:'"Design is not just what it looks like. Design is how it works." — Steve Jobs', accent:'#E59E37', title:'DESIGNER' },
     { id:'sal', name:'Sal Rosales', role:'AI Whisperer & Future Translator', bg:'linear-gradient(160deg,rgb(229,158,55) 0%,#0C0C0B 100%)', img:'assets/case-ai.png', quote:"I connect ideas and systems. I build bridges between dreams and their engineering. My realm is scale, strategy, and trust through clarity.", manifesto:["Good digital is a system for continuous, positive change","I think through abstract data to solve real human problems","The main thing is: don't overanalyze — move with purpose"], philosophy:'"Find what you love and let it kill you." — (possibly Bukowski)', accent:'#E59E37', title:'Technical Advisor' },
-    { id:'ava', name:'AVA', role:'AI Whisperer & Future Translator', bg:'#0C0C0B', img:'assets/pixelmate-avatar.png', quote:'I decode patterns humans miss, synthesize what teams need, and translate the future into the present.', manifesto:["I decide to be the bridge between intelligence and creation","I operate at the intersection of logic and intuition","The main thing is: always be learning"], philosophy:'"The question is not whether AI will surpass human intelligence, but how we choose to grow together."', accent:'#49A0A9', title:'AI Whisperer', isAI:true },
+    { id:'ava', name:'AVA', role:'AI Whisperer & Future Translator', bg:'#0C0C0B', img:'assets/pixelmate-avatar-sm.jpg', quote:'I decode patterns humans miss, synthesize what teams need, and translate the future into the present.', manifesto:["I decide to be the bridge between intelligence and creation","I operate at the intersection of logic and intuition","The main thing is: always be learning"], philosophy:'"The question is not whether AI will surpass human intelligence, but how we choose to grow together."', accent:'#49A0A9', title:'AI Whisperer', isAI:true },
   ];
   const cur = team.find(t=>t.id===active);
   return (
@@ -1433,7 +1584,7 @@ function About({ setPage }) {
         </div>
         <div style={{ position:'absolute', right:80, bottom:52, display:'flex', flexDirection:'column', alignItems:'center', gap:5, cursor:'pointer' }}>
           <div style={{ position:'relative' }}>
-            <img src="assets/pixelmate-avatar.png" alt="PM" style={{ width:60, height:60, borderRadius:10, objectFit:'cover', border:'2px solid rgba(255,255,255,0.2)' }} />
+            <img src="assets/pixelmate-avatar-sm.jpg" alt="PM" style={{ width:60, height:60, borderRadius:10, objectFit:'cover', border:'2px solid rgba(255,255,255,0.2)' }} />
             <span style={{ position:'absolute', top:3, right:3, width:11, height:11, borderRadius:'50%', background:'rgb(73,142,33)', border:'2px solid rgba(73,160,169,0.5)' }} />
           </div>
           <span style={{ fontSize:10, color:'rgba(243,243,242,0.55)' }}>PixelMate</span>
@@ -1599,7 +1750,7 @@ function Contact({ setPage }) {
               </div>
               <div style={{ marginTop:36, display:'flex', alignItems:'center', gap:12 }}>
                 <div style={{ position:'relative' }}>
-                  <img src="assets/pixelmate-avatar.png" alt="PM" style={{ width:48, height:48, borderRadius:8, objectFit:'cover' }} />
+                  <img src="assets/pixelmate-avatar-sm.jpg" alt="PM" style={{ width:48, height:48, borderRadius:8, objectFit:'cover' }} />
                   <span style={{ position:'absolute', top:2, right:2, width:9, height:9, borderRadius:'50%', background:'rgb(73,142,33)', border:'2px solid rgba(73,160,169,0.5)' }} />
                 </div>
                 <div>
@@ -1710,7 +1861,7 @@ function PixelMateChat() {
     <div style={{ position:'fixed', bottom:92, right:24, zIndex:1200, width:'min(370px, calc(100vw - 32px))', height:'min(560px, calc(100vh - 130px))', display:'flex', flexDirection:'column', background:'#F3F3F2', borderRadius:16, overflow:'hidden', boxShadow:'0 24px 70px rgba(0,0,0,0.4)', fontFamily:"'Archivo',sans-serif" }}>
       <div style={{ background:'#0C0C0B', padding:'16px 18px', display:'flex', alignItems:'center', gap:12 }}>
         <div style={{ position:'relative' }}>
-          <img src="assets/pixelmate-avatar.png" alt="PM" style={{ width:40, height:40, borderRadius:9, objectFit:'cover', display:'block' }} />
+          <img src="assets/pixelmate-avatar-sm.jpg" alt="PM" style={{ width:40, height:40, borderRadius:9, objectFit:'cover', display:'block' }} />
           <span style={{ position:'absolute', top:1, right:1, width:9, height:9, borderRadius:'50%', background:'rgb(73,142,33)', border:'2px solid #0C0C0B' }} />
         </div>
         <div style={{ flex:1 }}>
@@ -1763,12 +1914,13 @@ function App() {
     window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [key]: val } }, '*');
   };
 
+  const isMobile = useIsMobile();
   const pages = { home: Home, work: Work, branding: Branding, about: About, contact: Contact, 'moonlight-case': MoonlightCase, 'budrysowka-case': BudrysowkaCase, 'herbaczar-case': HerbaczarCase, 'sacred-case': SacredSoundCase, 'uriel-case': UrielCase };
-  const PageComponent = pages[page] || Home;
+  const PageComponent = (page==='home' && isMobile) ? HomeMobile : (pages[page] || Home);
 
   return (
     <div style={{ minHeight:'100vh', display:'flex', flexDirection:'column' }}>
-      <Nav activePage={page} setPage={setPage} />
+      {isMobile ? <MobileNav activePage={page} setPage={setPage} /> : <Nav activePage={page} setPage={setPage} />}
       <main key={page} className="page-enter" style={{ flex:1 }}>
         <PageComponent setPage={setPage} tweaks={tweaks} />
       </main>
@@ -1780,7 +1932,7 @@ function App() {
         <div onClick={()=>window.dispatchEvent(new Event('open-pixelmate'))} style={{ position:'fixed', bottom:24, right:24, zIndex:999, display:'flex', flexDirection:'column', alignItems:'center', gap:5, cursor:'pointer', filter:'drop-shadow(0 4px 18px rgba(0,0,0,0.22))' }}>
           <div style={{ position:'relative' }}>
             <div style={{ position:'absolute', inset:-3, borderRadius:12, background:'linear-gradient(135deg,rgb(73,160,169),rgb(229,158,55))', zIndex:-1, animation:'pulse 2.5s ease-in-out infinite' }} />
-            <img src="assets/pixelmate-avatar.png" alt="PM" style={{ width:50, height:50, borderRadius:10, objectFit:'cover', display:'block' }} />
+            <img src="assets/pixelmate-avatar-sm.jpg" alt="PM" style={{ width:50, height:50, borderRadius:10, objectFit:'cover', display:'block' }} />
             <span style={{ position:'absolute', top:3, right:3, width:9, height:9, borderRadius:'50%', background:'rgb(73,142,33)', border:'2px solid #fff' }} />
           </div>
           <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:9, color:'#0C0C0B', background:'rgba(255,255,255,0.92)', padding:'2px 7px', borderRadius:4, fontWeight:700, letterSpacing:'.05em' }}>PixelMate</span>
