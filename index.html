@@ -28,11 +28,25 @@
     .reveal.in { opacity:1; transform:translateY(0); }
     @keyframes floatY { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-10px); } }
     @keyframes glowPulse { 0%,100% { opacity:.5; } 50% { opacity:.85; } }
+    @keyframes dtIconIn { from { opacity:0; transform:translateY(14px) scale(.92); } to { opacity:1; transform:translateY(0) scale(1); } }
+    @keyframes dtWinIn { from { opacity:0; transform:translate(-50%,-50%) scale(.86); } to { opacity:1; transform:translate(-50%,-50%) scale(1); } }
+    @keyframes dtWinInTR { from { opacity:0; transform:scale(.82); } to { opacity:1; transform:scale(1); } }
+    @keyframes dtLaunch { 0%{transform:scale(1)} 35%{transform:scale(1.14)} 70%{transform:scale(.94)} 100%{transform:scale(1)} }
+    @keyframes dtSpin { to { transform:rotate(360deg); } }
+    @keyframes dtPop { from { opacity:0; transform:scale(.9); } to { opacity:1; transform:scale(1); } }
+    @keyframes dtWinOut { from { opacity:1; transform:scale(1); } to { opacity:0; transform:scale(.9); } }
+    @media (prefers-reduced-motion: reduce){ *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; } }
+    .dt-icon:focus-visible{ outline:2px solid #2b5aa5; outline-offset:2px; }
+    .ai-desktop-wrap :focus-visible{ outline:2px solid #2b5aa5; outline-offset:1px; }
+    .dt-icon{ transition:transform .18s ease, filter .18s ease; }
+    .dt-icon:hover{ transform:translateY(-6px); filter:drop-shadow(0 10px 18px rgba(30,60,90,.35)); }
+    .dt-icon.launch .dt-tile{ animation:dtLaunch .5s ease; }
   </style>
 </head>
 <body>
 <template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#0C0C0B"/><text x="50" y="62" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#E59E37" text-anchor="middle">PX</text></svg></template>
 <div id="root"></div>
+<script type="text/babel" src="ai-desktop.jsx"></script>
 <script type="text/babel">
 const { useState, useEffect, useRef } = React;
 
@@ -46,6 +60,7 @@ function useIsMobile(bp=760){
 function Nav({ activePage, setPage }) {
   const links = [
     { id: 'home', label: 'PiXEL' }, { id: 'work', label: 'Work' },
+    { id: 'ai-desktop', label: 'AI Desktop' },
     { id: 'branding', label: 'Branding' }, { id: 'about', label: 'About us' },
     { id: 'contact', label: 'Contact' },
   ];
@@ -73,6 +88,7 @@ function MobileNav({ activePage, setPage }) {
   const [open, setOpen] = useState(false);
   const links = [
     { id:'home', label:'PiXEL' }, { id:'work', label:'Work' },
+    { id:'ai-desktop', label:'AI Desktop' },
     { id:'branding', label:'Branding' }, { id:'about', label:'About us' },
     { id:'contact', label:'Contact' },
   ];
@@ -204,11 +220,11 @@ function Home({ setPage }) {
         <div style={{ position:'absolute', left:0, top:0, width:W, height:HERO, background:'url(assets/home/hero-bg.jpg) center top / cover no-repeat', backgroundColor:'#6f8f8c' }} />
         {/* HERO BAND */}
         {/* hero icons */}
-        <Ic setPage={setPage} x={362} y={176} src="assets/home/ic-ai-agents.png" label="AI Agents and chatbots" to="work" />
+        <Ic setPage={setPage} x={362} y={176} src="assets/home/ic-ai-agents.png" label="AI Agents and chatbots" to="ai-desktop" />
         <Ic setPage={setPage} x={485} y={343} size={204} round={12} src="assets/home/ic-sites.png" label="SITES and APP’s" to="work" />
         <Ic setPage={setPage} x={360} y={677} src="group-46011-mry3ji3z-2wzi.png" label="Branding" to="branding" />
-        <Ic setPage={setPage} x={607} y={677} src="mux-player-4-mry3jrnh-f93i.png" label="Business Automation" to="work" />
-        <Ic setPage={setPage} x={485} y={841} src="mux-player-5-mry3jyyx-c01r.png" label="Workflow Optimization" to="work" />
+        <Ic setPage={setPage} x={607} y={677} src="mux-player-4-mry3jrnh-f93i.png" label="Business Automation" to="ai-desktop" />
+        <Ic setPage={setPage} x={485} y={841} src="mux-player-5-mry3jyyx-c01r.png" label="Workflow Optimization" to="ai-desktop" />
         <Ic setPage={setPage} x={360} y={1090} src="vector-mry3d24q-j4ta.png" label="About us" to="about" />
         <Ic setPage={setPage} x={1584} y={846} src="assets/home/icon-pixelmate.jpg" label="PixelMate" chat />
         <SocialFolder />
@@ -234,9 +250,9 @@ function Home({ setPage }) {
           </div>} />
         <Ic setPage={setPage} x={1330} y={orangeTop+158} src="group-46011-2-mry3lx9q-hm54.png" label="Branding" to="branding" />
         <Ic setPage={setPage} x={611} y={orangeTop+326} src="mux-player-7-mry3m4ep-0jwu.png" label="AI Personal Stylist App" to="uriel-case" />
-        <Ic setPage={setPage} x={900} y={orangeTop+166} src="assets/case-budrysowka-cover.jpg" label="Budrysówka website" to="budrysowka-case" />
+        <Ic setPage={setPage} x={900} y={orangeTop+166} src="assets/home/ic-budrysowka.jpg" label="Budrysówka website" to="budrysowka-case" round={18} />
         <Ic setPage={setPage} x={1095} y={orangeTop+166} src="-copy-mry40rgx-xyyo.jpg" label="Herbaczar website" to="herbaczar-case" />
-        <Ic setPage={setPage} x={1300} y={orangeTop+340} src="assets/sacred-cover.jpg" label="Sacred Sound & Spirit website" to="sacred-case" />
+        <Ic setPage={setPage} x={1300} y={orangeTop+340} src="assets/home/ic-sacred.jpg" label="Sacred Sound & Spirit website" to="sacred-case" round={18} />
         {/* services heading */}
         <div style={{ position:'absolute', left:703, top:orangeTop+490, width:514, display:'flex', flexDirection:'column', gap:16, alignItems:'center' }}>
           <span style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:36, textTransform:'uppercase', color:'#F3F3F2', textAlign:'center' }}>Services and use cases</span>
@@ -273,9 +289,10 @@ function Home({ setPage }) {
         <div style={{ position:'absolute', left:703, top:darkTop+540, width:514, textAlign:'center' }}>
           <span style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:36, textTransform:'uppercase', color:'#F3F3F2' }}>Results come first</span>
         </div>
-        <Ic setPage={setPage} x={360} y={darkTop+560} src="svg-mry3mg2d-zamd.png" label="About us" to="about" dark />
+        <Ic setPage={setPage} x={360} y={darkTop+760} src="svg-mry3mg2d-zamd.png" label="About us" to="about" dark />
         <Ic setPage={setPage} x={1240} y={darkTop+540} size={215} round={12} src="mux-player-4-mry3o6uu-r16d.png" label="Check what you need" to="contact" dark />
       </Stage>
+      <MiniAIDesktop setPage={setPage} />
     </div>
   );
 }
@@ -344,11 +361,11 @@ function HomeMobile({ setPage }) {
           <MIc setPage={setPage} ext="#" src="assets/home/ic-linkedin.png" label="Linkedin" round={16} />
           <MIc setPage={setPage} ext="#" src="assets/home/ic-whatsapp.png" label="WhatsApp" round={16} />
           <MIc setPage={setPage} ext="#" src="assets/home/ic-instagram.png" label="Instagram" round={16} />
-          <MIc setPage={setPage} to="work" src="assets/home/ic-ai-agents.png" label="AI Agents and chatbots" />
+          <MIc setPage={setPage} to="ai-desktop" src="assets/home/ic-ai-agents.png" label="AI Agents and chatbots" />
           <MIc setPage={setPage} to="work" src="assets/home/ic-sites.png" label="SITES and APP’s" />
           <MIc setPage={setPage} to="branding" src="group-46011-mry3ji3z-2wzi.png" label="Branding" round={16} />
-          <MIc setPage={setPage} to="work" src="assets/home/check-robot.png" label="Business Automation" />
-          <MIc setPage={setPage} to="work" src="mux-player-5-mry3jyyx-c01r.png" label="Workflow Optimization" />
+          <MIc setPage={setPage} to="ai-desktop" src="assets/home/check-robot.png" label="Business Automation" />
+          <MIc setPage={setPage} to="ai-desktop" src="mux-player-5-mry3jyyx-c01r.png" label="Workflow Optimization" />
           <MIc setPage={setPage} to="about" src="vector-mry3d24q-j4ta.png" label="About us" />
         </div>
       </section>
@@ -361,9 +378,9 @@ function HomeMobile({ setPage }) {
           <MIc setPage={setPage} to="moonlight-case" face={moonFace} label="Janice website" />
           <MIc setPage={setPage} to="branding" src="group-46011-2-mry3lx9q-hm54.png" label="Branding" />
           <MIc setPage={setPage} to="uriel-case" src="mux-player-7-mry3m4ep-0jwu.png" label="AI Personal Stylist App" />
-          <MIc setPage={setPage} to="budrysowka-case" src="assets/case-budrysowka-cover.jpg" label="Budrysówka website" />
+          <MIc setPage={setPage} to="budrysowka-case" src="assets/home/ic-budrysowka.jpg" label="Budrysówka website" round={16} />
           <MIc setPage={setPage} to="herbaczar-case" src="-copy-mry40rgx-xyyo.jpg" label="Herbaczar website" />
-          <MIc setPage={setPage} to="sacred-case" src="assets/sacred-cover.jpg" label="Sacred Sound &amp; Spirit website" />
+          <MIc setPage={setPage} to="sacred-case" src="assets/home/ic-sacred.jpg" label="Sacred Sound &amp; Spirit website" round={16} />
           <MIc setPage={setPage} to="contact" flat round={8} src="vintage-pager-display-message-copy-1-mry3ni2x-fem8.png" label="Check what you need" />
           <MIc setPage={setPage} to="work" src="assets/home/ic-sites.png" label="SITES and APP’s" />
           <MIc setPage={setPage} to="contact" face={placeFace} round={16} label="Place for you" />
@@ -395,6 +412,7 @@ function HomeMobile({ setPage }) {
           <MIc setPage={setPage} to="contact" dark round={12} src="mux-player-4-mry3o6uu-r16d.png" label="Check what you need" />
         </div>
       </section>
+      <MiniAIDesktop setPage={setPage} mobile />
     </div>
   );
 }
@@ -402,6 +420,7 @@ function HomeMobile({ setPage }) {
 /* ─── WORK ─── */
 function Work({ setPage }) {
   const [hov, setHov] = useState(null);
+  const isMobile = useIsMobile();
   const cases = [
     { id:'moonlight', title:'Moonlight Company', sub:'Website Strategy · Design · Development', tags:['Branding','Web'], color:'#49A0A9', quote:"It's not just a site, it's my story told right.", author:'Janice Grodsky, Founder & CEO', img:'assets/case-moonlight-cover.png' },
     { id:'budrysowka', title:'Budrysówka', sub:'Rapid Launch · AI Photography · 2 Hours', tags:['Web','AI'], color:'#E59E37', quote:'Zero infrastructure costs, one link to share.', author:'Pixel Experts Team', img:'assets/case-budrysowka-cover.jpg' },
@@ -413,20 +432,20 @@ function Work({ setPage }) {
   return (
     <div style={{ fontFamily:"'Archivo',sans-serif", background:'#F3F3F2' }}>
       {/* HERO */}
-      <section style={{ position:'relative', minHeight:'56vh', display:'flex', alignItems:'flex-end', overflow:'hidden', background:'#0C0C0B', padding:'0 80px 80px' }}>
+      <section style={{ position:'relative', minHeight:isMobile?'auto':'56vh', display:'flex', alignItems:'flex-end', overflow:'hidden', background:'#0C0C0B', padding:isMobile?'0 20px 48px':'0 80px 80px' }}>
         <div style={{ position:'absolute', inset:0, backgroundImage:'url(assets/hero-bg.jpg)', backgroundSize:'cover', backgroundPosition:'center 20%', opacity:.45 }} />
         <div style={{ position:'absolute', top:-200, right:-150, width:640, height:640, borderRadius:'50%', background:'rgb(73,160,169)', opacity:.22 }} />
         <div style={{ position:'absolute', bottom:-100, left:-150, width:480, height:480, borderRadius:'50%', background:'rgba(73,160,169,0.18)' }} />
-        <div style={{ position:'relative', zIndex:2, maxWidth:1280, margin:'0 auto', width:'100%', paddingTop:140 }}>
+        <div style={{ position:'relative', zIndex:2, maxWidth:1280, margin:'0 auto', width:'100%', paddingTop:isMobile?116:140 }}>
           <span style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:'rgb(73,160,169)', letterSpacing:'.15em', display:'block', marginBottom:16 }}>OUR WORK</span>
           <h1 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(52px,8vw,100px)', color:'#F3F3F2', lineHeight:1 }}>Results come first</h1>
-          <p style={{ fontSize:17, color:'rgba(243,243,242,0.5)', maxWidth:480, marginTop:18, lineHeight:1.65 }}>We create brand experiences where intelligence and design work as one.</p>
+          <p style={{ fontSize:isMobile?15:17, color:'rgba(243,243,242,0.5)', maxWidth:480, marginTop:18, lineHeight:1.65 }}>We create brand experiences where intelligence and design work as one.</p>
         </div>
       </section>
 
       {/* CASES */}
-      <section style={{ padding:'80px', background:'#F3F3F2' }}>
-        <div style={{ maxWidth:1280, margin:'0 auto', display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(540px,1fr))', gap:28 }}>
+      <section style={{ padding:isMobile?'52px 20px':'80px', background:'#F3F3F2' }}>
+        <div style={{ maxWidth:1280, margin:'0 auto', display:'grid', gridTemplateColumns:isMobile?'1fr':'repeat(auto-fit,minmax(540px,1fr))', gap:28 }}>
           {cases.map(c=>(
             <div key={c.id} onMouseEnter={()=>setHov(c.id)} onMouseLeave={()=>setHov(null)}
               style={{ borderRadius:16, overflow:'hidden', background:'#fff', boxShadow:hov===c.id?'0 24px 56px rgba(0,0,0,0.11)':'0 4px 18px rgba(0,0,0,0.05)', transition:'all .35s', transform:hov===c.id?'translateY(-6px)':'none', cursor:'pointer', border:'1px solid rgba(0,0,0,0.05)' }}
@@ -452,10 +471,10 @@ function Work({ setPage }) {
       </section>
 
       {/* PIXEL vs TRADITIONAL */}
-      <section style={{ padding:'80px', background:'linear-gradient(160deg,rgb(73,160,169) 0%,rgb(229,158,55) 100%)' }}>
+      <section style={{ padding:isMobile?'56px 20px':'80px', background:'linear-gradient(160deg,rgb(73,160,169) 0%,rgb(229,158,55) 100%)' }}>
         <div style={{ maxWidth:1280, margin:'0 auto' }}>
-          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(36px,5vw,60px)', color:'#F3F3F2', textAlign:'center', marginBottom:52 }}>Pixel vs. Traditional</h2>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(36px,5vw,60px)', color:'#F3F3F2', textAlign:'center', marginBottom:isMobile?32:52 }}>Pixel vs. Traditional</h2>
+          <div style={{ display:'grid', gridTemplateColumns:isMobile?'1fr':'1fr 1fr', gap:20 }}>
             {[
               { label:'Traditional Agency', items:['Fixed templates','Slow iterations','One-size-fits-all','AI as a gimmick','Handoff and forget'], dark:false },
               { label:'Pixel Experts Team', items:['Bespoke systems','Continuous improvement','Built for your context','AI as core infrastructure','Long-term partnership'], dark:true },
@@ -475,7 +494,7 @@ function Work({ setPage }) {
       </section>
 
       {/* BIG QUOTE */}
-      <section style={{ padding:'100px 80px', background:'#0C0C0B', position:'relative', overflow:'hidden' }}>
+      <section style={{ padding:isMobile?'64px 20px':'100px 80px', background:'#0C0C0B', position:'relative', overflow:'hidden' }}>
         <div style={{ position:'absolute', left:60, top:'50%', transform:'translateY(-50%)', opacity:.05, fontFamily:"'Jersey 25'", fontSize:400, color:'#fff', lineHeight:1, pointerEvents:'none', userSelect:'none' }}>"</div>
         <div style={{ maxWidth:800, margin:'0 auto', textAlign:'center', position:'relative', zIndex:1 }}>
           <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:'clamp(19px,2.5vw,28px)', color:'#F3F3F2', lineHeight:1.55, marginBottom:36 }}>
@@ -1457,6 +1476,7 @@ function UrielCase({ setPage }) {
 function Branding({ setPage }) {
   const [open, setOpen] = useState(null);
   const [game, setGame] = useState(false);
+  const isMobile = useIsMobile();
   const faqs = [
     { q:'What is a brandbook?', a:"A brandbook is your brand's digital DNA. From typography to tone, from colours to character — it captures what already exists inside your brand and turns it into a system that speaks clearly and consistently." },
     { q:'What problems does a brandbook solve?', a:"It eliminates inconsistency across touchpoints, gives your team a single source of truth, and ensures your brand communicates the same story whether it's a social post or a full website." },
@@ -1466,10 +1486,10 @@ function Branding({ setPage }) {
   return (
     <div style={{ fontFamily:"'Archivo',sans-serif", background:'#F3F3F2' }}>
       {/* HERO */}
-      <section style={{ position:'relative', minHeight:'100vh', display:'flex', alignItems:'center', overflow:'hidden', background:'#F3F3F2', padding:'140px 80px 80px' }}>
+      <section style={{ position:'relative', minHeight:'100vh', display:'flex', alignItems:'center', overflow:'hidden', background:'#F3F3F2', padding:isMobile?'110px 20px 60px':'140px 80px 80px' }}>
         <div style={{ position:'absolute', inset:0, backgroundImage:'url(assets/team-elena.jpg)', backgroundSize:'cover', backgroundPosition:'center', opacity:.14 }} />
         <div style={{ position:'absolute', top:-120, right:-120, width:660, height:660, borderRadius:'50%', background:'rgb(73,160,169)', opacity:.13 }} />
-        <div style={{ maxWidth:1280, margin:'0 auto', width:'100%', display:'grid', gridTemplateColumns:'1fr 1fr', gap:72, alignItems:'center', position:'relative', zIndex:1 }}>
+        <div style={{ maxWidth:1280, margin:'0 auto', width:'100%', display:'grid', gridTemplateColumns:isMobile?'1fr':'1fr 1fr', gap:isMobile?36:72, alignItems:'center', position:'relative', zIndex:1 }}>
           <div>
             <span style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:'#49A0A9', letterSpacing:'.15em', display:'block', marginBottom:20 }}>BRANDING</span>
             <h1 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(44px,6vw,78px)', color:'#0C0C0B', lineHeight:1, margin:'0 0 22px' }}>Your brand.<br /><span style={{ color:'rgb(73,160,169)' }}>Recognizable</span><br />at a glance.</h1>
@@ -1494,16 +1514,16 @@ function Branding({ setPage }) {
       </section>
 
       {/* CASES */}
-      <section style={{ padding:'80px', background:'linear-gradient(160deg,#F3F3F2 0%,rgb(229,158,55) 100%)' }}>
+      <section style={{ padding:isMobile?'56px 20px':'80px', background:'linear-gradient(160deg,#F3F3F2 0%,rgb(229,158,55) 100%)' }}>
         <div style={{ maxWidth:1280, margin:'0 auto' }}>
           <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(36px,5vw,56px)', color:'#0C0C0B', textAlign:'center', marginBottom:8 }}>branding</h2>
           <p style={{ textAlign:'center', fontSize:14, color:'rgba(12,12,11,0.5)', marginBottom:48 }}>Selected brand identities</p>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(320px,1fr))', gap:24 }}>
+          <div style={{ display:'grid', gridTemplateColumns:isMobile?'1fr':'repeat(auto-fit,minmax(320px,1fr))', gap:24 }}>
             {[
-              { title:'Janice Grodsky', sub:'Moonlight Company', img:'assets/brandbook-janice.png', tag:'Website + Brand' },
-              { title:'Uriel Saenz', sub:'US Lifestyle Group', img:'assets/brandbook-uriel-sm.jpg', tag:'Brand Identity' },
+              { title:'Janice Grodsky', sub:'Moonlight Company', img:'assets/brandbook-janice.png', tag:'Website + Brand', pdf:'assets/moonlight-brandbook.pdf' },
+              { title:'Uriel Saenz', sub:'US Lifestyle Group', img:'assets/brandbook-uriel-sm.jpg', tag:'Brand Identity', pdf:'assets/uriel-brandbook.pdf' },
             ].map((c,i)=>(
-              <div key={i} style={{ background:'#fff', borderRadius:12, overflow:'hidden', boxShadow:'0 4px 22px rgba(0,0,0,0.08)', cursor:'pointer' }}>
+              <div key={i} onClick={()=>c.pdf && window.open(c.pdf,'_blank','noopener')} style={{ background:'#fff', borderRadius:12, overflow:'hidden', boxShadow:'0 4px 22px rgba(0,0,0,0.08)', cursor:c.pdf?'pointer':'default' }}>
                 <div style={{ height:190, background:`url(${c.img}) center/cover no-repeat` }} />
                 <div style={{ display:'flex', justifyContent:'center', gap:6, padding:'10px 0', background:'#fff' }}>
                   {[0,1,2].map(d=><span key={d} style={{ width:d===0?16:8, height:8, borderRadius:4, background:d===0?'#0C0C0B':'rgba(12,12,11,0.12)' }} />)}
@@ -1512,6 +1532,7 @@ function Branding({ setPage }) {
                   <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:10, color:'#49A0A9', fontWeight:700, letterSpacing:'.1em' }}>{c.tag}</span>
                   <h3 style={{ fontFamily:"'Archivo',sans-serif", fontWeight:700, fontSize:19, color:'#0C0C0B', marginTop:6, marginBottom:3 }}>{c.title}</h3>
                   <p style={{ fontSize:12, color:'rgba(12,12,11,0.45)' }}>{c.sub} brand book</p>
+                  {c.pdf && <span style={{ display:'inline-block', marginTop:10, fontFamily:"'Archivo',sans-serif", fontSize:12, fontWeight:700, color:'#49A0A9' }}>Open brand book PDF →</span>}
                 </div>
               </div>
             ))}
@@ -1523,7 +1544,7 @@ function Branding({ setPage }) {
       </section>
 
       {/* CTA */}
-      <section style={{ padding:'100px 80px', background:'url(assets/team-bg2.jpg) center/cover no-repeat', position:'relative' }}>
+      <section style={{ padding:isMobile?'64px 20px':'100px 80px', background:'url(assets/team-bg2.jpg) center/cover no-repeat', position:'relative' }}>
         <div style={{ position:'absolute', inset:0, background:'rgba(12,12,11,0.75)' }} />
         <div style={{ position:'relative', zIndex:1, maxWidth:580, margin:'0 auto', textAlign:'center' }}>
           <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(32px,5vw,52px)', color:'#F3F3F2', marginBottom:18 }}>Time to move beyond a logo.</h2>
@@ -1533,7 +1554,7 @@ function Branding({ setPage }) {
       </section>
 
       {/* FAQ */}
-      <section style={{ padding:'80px', background:'#F3F3F2' }}>
+      <section style={{ padding:isMobile?'56px 20px':'80px', background:'#F3F3F2' }}>
         <div style={{ maxWidth:780, margin:'0 auto' }}>
           <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(32px,4vw,48px)', color:'#0C0C0B', textAlign:'center', marginBottom:44 }}>Frequently asked</h2>
           {faqs.map((f,i)=>(
@@ -1549,7 +1570,7 @@ function Branding({ setPage }) {
       </section>
 
       {/* GAME OVER */}
-      <section style={{ padding:'100px 80px', background:'url(assets/gameover-bg.jpg) center/cover no-repeat', position:'relative', textAlign:'center' }}>
+      <section style={{ padding:isMobile?'64px 20px':'100px 80px', background:'url(assets/gameover-bg.jpg) center/cover no-repeat', position:'relative', textAlign:'center' }}>
         <div style={{ position:'absolute', inset:0, background:'rgba(12,12,11,0.62)' }} />
         <div style={{ position:'relative', zIndex:1 }}>
           {!game ? <>
@@ -1566,6 +1587,7 @@ function Branding({ setPage }) {
 /* ─── ABOUT ─── */
 function About({ setPage }) {
   const [active, setActive] = useState('elena');
+  const isMobile = useIsMobile();
   const team = [
     { id:'elena', name:'Elena Utivaleeva', role:'Synchronizer of meaning and team', bg:'linear-gradient(160deg,rgb(73,160,169) 0%,#0C0C0B 100%)', img:'assets/team-elena.jpg', quote:'I explore the problem we can truly solve for the client. I build human connections so the current of decisions flows smoothly.', manifesto:["Good digital doesn't waste your time","I think through thousands of contradictions","The main thing is: don't give up"], philosophy:'"Let him who can reach the source not settle for the jug." — attributed to Leonardo da Vinci', accent:'#49A0A9', title:'LEAD' },
     { id:'oksana', name:'Oksana Gurban', role:'Visual translator of meaning', bg:'linear-gradient(160deg,#0C0C0B 0%,rgb(73,160,169) 100%)', img:'assets/team-bg2.jpg', quote:'I turn ideas into visual systems. I create a language that connects the brand and its audience. Beautiful, logical, functional — all at once.', manifesto:["Good digital is when technology helps the person","I think through logic","The main thing is: don't give up"], philosophy:'"Design is not just what it looks like. Design is how it works." — Steve Jobs', accent:'#E59E37', title:'DESIGNER' },
@@ -1576,23 +1598,23 @@ function About({ setPage }) {
   return (
     <div style={{ fontFamily:"'Archivo',sans-serif" }}>
       {/* HERO */}
-      <section style={{ position:'relative', minHeight:'52vh', display:'flex', alignItems:'center', overflow:'hidden', background:'linear-gradient(160deg,rgb(73,160,169) 49%,#0C0C0B 100%)', padding:'140px 80px 80px' }}>
+      <section style={{ position:'relative', minHeight:isMobile?'auto':'52vh', display:'flex', alignItems:'center', overflow:'hidden', background:'linear-gradient(160deg,rgb(73,160,169) 49%,#0C0C0B 100%)', padding:isMobile?'104px 20px 56px':'140px 80px 80px' }}>
         <div style={{ maxWidth:1280, margin:'0 auto', width:'100%' }}>
           <span style={{ fontFamily:"'DotGothic16',sans-serif", fontSize:12, color:'rgba(243,243,242,0.55)', letterSpacing:'.15em', display:'block', marginBottom:18 }}>ABOUT US</span>
           <h1 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(44px,7vw,88px)', color:'#F3F3F2', lineHeight:1, margin:'0 0 20px' }}>Less noise.<br /><span style={{ color:'rgb(229,158,55)' }}>More meaning.</span></h1>
-          <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:19, color:'rgba(243,243,242,0.72)', maxWidth:520, lineHeight:1.65 }}>We think through design, code, and empathy. Every decision is made by a person — here is a system where each element shapes the whole.</p>
+          <p style={{ fontFamily:"'Fustat',sans-serif", fontSize:isMobile?16:19, color:'rgba(243,243,242,0.72)', maxWidth:520, lineHeight:1.65 }}>We think through design, code, and empathy. Every decision is made by a person — here is a system where each element shapes the whole.</p>
         </div>
-        <div style={{ position:'absolute', right:80, bottom:52, display:'flex', flexDirection:'column', alignItems:'center', gap:5, cursor:'pointer' }}>
+        {!isMobile && <div style={{ position:'absolute', right:80, bottom:52, display:'flex', flexDirection:'column', alignItems:'center', gap:5, cursor:'pointer' }}>
           <div style={{ position:'relative' }}>
             <img src="assets/pixelmate-avatar-sm.jpg" alt="PM" style={{ width:60, height:60, borderRadius:10, objectFit:'cover', border:'2px solid rgba(255,255,255,0.2)' }} />
             <span style={{ position:'absolute', top:3, right:3, width:11, height:11, borderRadius:'50%', background:'rgb(73,142,33)', border:'2px solid rgba(73,160,169,0.5)' }} />
           </div>
           <span style={{ fontSize:10, color:'rgba(243,243,242,0.55)' }}>PixelMate</span>
-        </div>
+        </div>}
       </section>
 
       {/* TEAM TABS */}
-      <section style={{ background:'#F3F3F2', padding:'0 80px' }}>
+      <section style={{ background:'#F3F3F2', padding:isMobile?'0 12px':'0 80px' }}>
         <div style={{ maxWidth:1280, margin:'0 auto', display:'flex', gap:0, borderBottom:'1px solid rgba(0,0,0,0.09)', overflowX:'auto' }}>
           {team.map(t=>(
             <button key={t.id} onClick={()=>setActive(t.id)} style={{ background:'none', border:'none', padding:'18px 24px', fontFamily:"'Jersey 25',sans-serif", fontSize:15, color:active===t.id?t.accent:'rgba(12,12,11,0.4)', borderBottom:active===t.id?`3px solid ${t.accent}`:'3px solid transparent', cursor:'pointer', whiteSpace:'nowrap', transition:'all .2s', marginBottom:-1 }}>
@@ -1603,9 +1625,9 @@ function About({ setPage }) {
       </section>
 
       {/* MEMBER DETAIL */}
-      <section style={{ minHeight:'62vh', background:cur.id==='ava'?`url(assets/ava-bg.jpg) center/cover no-repeat`:cur.bg, position:'relative', overflow:'hidden', padding:'72px 80px' }}>
+      <section style={{ minHeight:isMobile?'auto':'62vh', background:cur.id==='ava'?`url(assets/ava-bg.jpg) center/cover no-repeat`:cur.bg, position:'relative', overflow:'hidden', padding:isMobile?'40px 20px':'72px 80px' }}>
         {cur.id==='ava'&&<div style={{ position:'absolute', inset:0, background:'rgba(12,12,11,0.7)' }} />}
-        <div style={{ maxWidth:1280, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:36, position:'relative', zIndex:1, alignItems:'start' }}>
+        <div style={{ maxWidth:1280, margin:'0 auto', display:'grid', gridTemplateColumns:isMobile?'1fr':'1fr 1fr 1fr', gap:isMobile?24:36, position:'relative', zIndex:1, alignItems:'start' }}>
           {/* Card */}
           <div style={{ background:'rgba(243,243,242,0.13)', backdropFilter:'blur(18px)', border:'1px solid rgba(243,243,242,0.18)', borderRadius:12, padding:26 }}>
             <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:20 }}>
@@ -1649,10 +1671,10 @@ function About({ setPage }) {
       </section>
 
       {/* VALUES */}
-      <section style={{ padding:'80px', background:'#F3F3F2' }}>
+      <section style={{ padding:isMobile?'56px 20px':'80px', background:'#F3F3F2' }}>
         <div style={{ maxWidth:1280, margin:'0 auto' }}>
-          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(36px,5vw,56px)', color:'#0C0C0B', textAlign:'center', marginBottom:48 }}>What we believe</h2>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:20 }}>
+          <h2 style={{ fontFamily:"'Jersey 25',sans-serif", fontSize:'clamp(36px,5vw,56px)', color:'#0C0C0B', textAlign:'center', marginBottom:isMobile?32:48 }}>What we believe</h2>
+          <div style={{ display:'grid', gridTemplateColumns:isMobile?'1fr':'repeat(3,1fr)', gap:20 }}>
             {[
               { icon:'◈', title:'Care for the human', text:'Every project begins with listening. We design for people, not portfolios.' },
               { icon:'⬡', title:'Intelligence + empathy', text:'AI is a tool. Humans are the architects. Together, they make something no one expected.' },
@@ -1886,6 +1908,68 @@ function PixelMateChat() {
   );
 }
 
+/* ─── AI DESKTOP (retro OS section) ─── */
+function DTGlyph({ k, color }) {
+  const s = { width:30, height:30, viewBox:'0 0 28 28', fill:'none', stroke:color, strokeWidth:2, strokeLinecap:'round', strokeLinejoin:'round' };
+  const P = {
+    strategy: <g><circle cx="14" cy="14" r="10"/><circle cx="14" cy="14" r="5.5"/><circle cx="14" cy="14" r="1.4" fill={color} stroke="none"/></g>,
+    assessment: <g><line x1="4" y1="24" x2="24" y2="24"/><rect x="6" y="14" width="4" height="8"/><rect x="12" y="9" width="4" height="13"/><rect x="18" y="5" width="4" height="17"/></g>,
+    workforce: <g><circle cx="10" cy="10" r="3.2"/><path d="M4.5 22c0-3.4 2.5-5.5 5.5-5.5s5.5 2.1 5.5 5.5"/><circle cx="19.5" cy="11" r="2.6"/><path d="M17 22c0-2.4 1.2-4.4 3-5"/></g>,
+    automation: <g><circle cx="14" cy="14" r="4"/><path d="M14 3.5v3M14 21.5v3M3.5 14h3M21.5 14h3M6.5 6.5l2.1 2.1M19.4 19.4l2.1 2.1M21.5 6.5l-2.1 2.1M6.5 21.5l2.1-2.1"/></g>,
+    visibility: <g><path d="M2.5 14C6 8 10 6 14 6s8 2 11.5 8C22 20 18 22 14 22S6 20 2.5 14Z"/><circle cx="14" cy="14" r="3"/></g>,
+    websites: <g><circle cx="14" cy="14" r="10"/><ellipse cx="14" cy="14" rx="4.2" ry="10"/><line x1="4" y1="14" x2="24" y2="14"/><line x1="6" y1="8.5" x2="22" y2="8.5"/><line x1="6" y1="19.5" x2="22" y2="19.5"/></g>,
+    creative: <g><path d="M20 5l3 3-9.5 9.5-4 1 1-4L20 5Z"/><path d="M6 20c0 2 1.5 3.2 3 3.2 2.2 0 3-1.8 3-3.4"/></g>,
+    products: <g><path d="M14 4l9 5v10l-9 5-9-5V9l9-5Z"/><path d="M5 9l9 5 9-5M14 14v10"/></g>,
+    training: <g><path d="M14 5l11 5-11 5L3 10l11-5Z"/><path d="M8 12v5.5c0 1.7 2.7 3 6 3s6-1.3 6-3V12"/><line x1="25" y1="10" x2="25" y2="16"/></g>,
+  };
+  return <svg {...s}>{P[k]}</svg>;
+}
+
+function AIDesktop(){ return <div className="ai-desktop-wrap">{React.createElement(window.AIDesktopFull)}</div>; }
+
+/* ─── AI DESKTOP (mini teaser for home) ─── */
+function MiniAIDesktop({ setPage, mobile }) {
+  const TEAL='rgb(73,160,169)', AMBER='rgb(229,158,55)', INDIGO='#4f6fb5';
+  const SYS = "'Tahoma','Geneva','Verdana',sans-serif";
+  const items = [
+    ['strategy','AI Strategy',TEAL],['assessment','AI Assessment',INDIGO],['workforce','AI Workforce',AMBER],
+    ['automation','AI Automation',TEAL],['visibility','AI Visibility',INDIGO],['websites','AI Websites',AMBER],
+    ['creative','Creative Studio',TEAL],['products','Our Products',INDIGO],['training','AI Training',AMBER],
+  ];
+  return (
+    <section style={{ background:'#0C0C0B', padding:mobile?'42px 16px 48px':'96px 40px 104px', display:'flex', justifyContent:'center' }}>
+      <div style={{ width:'100%', maxWidth:940, borderRadius:16, overflow:'hidden', border:'1px solid #2b5aa5', boxShadow:'0 26px 70px rgba(0,0,0,.5)' }}>
+        {/* title bar */}
+        <div style={{ display:'flex', alignItems:'center', height:34, padding:'0 8px 0 12px', background:'linear-gradient(180deg,#5a92dd,#356bbd)', color:'#fff' }}>
+          <span style={{ flex:1, fontFamily:SYS, fontSize:13.5, fontWeight:700, textShadow:'0 1px 1px rgba(0,0,0,.35)' }}>Pixel OS — AI Services</span>
+          <span style={{ display:'flex', gap:5 }}>{['–','▢','✕'].map((g,i)=><span key={i} style={{ width:20, height:17, borderRadius:4, border:'1px solid rgba(255,255,255,.5)', background:i===2?'linear-gradient(180deg,#e97b6a,#d5503a)':'linear-gradient(180deg,#7ea9e4,#4d7fc9)', fontSize:10, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:SYS }}>{g}</span>)}</span>
+        </div>
+        {/* desktop body */}
+        <div style={{ position:'relative', padding:mobile?'26px 16px 24px':'40px 32px 36px', background:'radial-gradient(120% 90% at 50% 0%, #d7e2ee 0%, #c0cee0 48%, #a7b8cf 82%, #93a6be 100%)' }}>
+          <div style={{ position:'absolute', inset:0, pointerEvents:'none', backgroundImage:'repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 3px)', opacity:.5 }} />
+          <div style={{ position:'relative', textAlign:'center', marginBottom:mobile?20:26 }}>
+            <h3 style={{ fontFamily:"'Jersey 25',sans-serif", textTransform:'uppercase', color:'#20344f', fontSize:mobile?28:38, letterSpacing:'.02em', textShadow:'0 1px 0 rgba(255,255,255,.5)' }}>The AI Desktop</h3>
+            <p style={{ fontFamily:"'Archivo',sans-serif", color:'#37506e', fontSize:mobile?13:15, marginTop:4 }}>Nine AI services, one interactive desktop.</p>
+          </div>
+          <div style={{ position:'relative', display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:mobile?'16px 10px':'22px 30px', maxWidth:mobile?320:520, margin:'0 auto' }}>
+            {items.map(([k,label,color])=>(
+              <div key={k} className="dt-icon" onClick={()=>setPage('ai-desktop')} style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:7, cursor:'pointer' }}>
+                <div className="dt-tile" style={{ width:mobile?54:62, height:mobile?54:62, borderRadius:14, display:'flex', alignItems:'center', justifyContent:'center', background:'linear-gradient(145deg,#ffffff,#e4edf6)', border:'1px solid rgba(255,255,255,.9)', boxShadow:'0 7px 14px rgba(40,70,110,.26), inset 0 1px 0 #fff' }}>
+                  <DTGlyph k={k} color={color} />
+                </div>
+                <span style={{ fontFamily:"'Archivo',sans-serif", fontSize:mobile?11.5:12.5, fontWeight:600, color:'#1d3050', textAlign:'center', lineHeight:1.15, textShadow:'0 1px 2px rgba(255,255,255,.6)' }}>{label}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{ position:'relative', textAlign:'center', marginTop:mobile?24:30 }}>
+            <button onClick={()=>setPage('ai-desktop')} style={{ background:'linear-gradient(180deg,'+TEAL+',rgb(56,128,136))', color:'#fff', border:'1px solid rgb(48,110,118)', borderRadius:7, padding:mobile?'11px 22px':'13px 30px', fontFamily:SYS, fontSize:mobile?13:14, fontWeight:700, cursor:'pointer', boxShadow:'0 1px 0 rgba(255,255,255,.4) inset' }}>Open the AI Desktop →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function App() {
   const saved = (() => { try { return localStorage.getItem('pixel_page')||'home'; } catch { return 'home'; } })();
   const [page, setPageRaw] = useState(saved);
@@ -1915,7 +1999,7 @@ function App() {
   };
 
   const isMobile = useIsMobile();
-  const pages = { home: Home, work: Work, branding: Branding, about: About, contact: Contact, 'moonlight-case': MoonlightCase, 'budrysowka-case': BudrysowkaCase, 'herbaczar-case': HerbaczarCase, 'sacred-case': SacredSoundCase, 'uriel-case': UrielCase };
+  const pages = { home: Home, work: Work, branding: Branding, about: About, contact: Contact, 'ai-desktop': AIDesktop, 'moonlight-case': MoonlightCase, 'budrysowka-case': BudrysowkaCase, 'herbaczar-case': HerbaczarCase, 'sacred-case': SacredSoundCase, 'uriel-case': UrielCase };
   const PageComponent = (page==='home' && isMobile) ? HomeMobile : (pages[page] || Home);
 
   return (
@@ -1969,7 +2053,7 @@ function App() {
             <div>
               <label style={{ fontFamily:"'Archivo',sans-serif", fontSize:10, color:'rgba(243,243,242,0.5)', display:'block', marginBottom:7 }}>Quick nav</label>
               <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>
-                {[['home','Home'],['work','Work'],['branding','Brand'],['about','About'],['contact','Contact']].map(([id,lb])=>(
+                {[['home','Home'],['work','Work'],['ai-desktop','AI OS'],['branding','Brand'],['about','About'],['contact','Contact']].map(([id,lb])=>(
                   <button key={id} onClick={()=>setPage(id)} style={{ background:page===id?'rgb(73,160,169)':'rgba(255,255,255,0.07)', border:'none', borderRadius:5, padding:'4px 10px', fontFamily:"'Archivo',sans-serif", fontSize:10, color:'#F3F3F2', cursor:'pointer' }}>{lb}</button>
                 ))}
               </div>
